@@ -8,11 +8,7 @@ let
 	twint = mach-nix.buildPythonPackage {
 		# src = "https://github.com/twintproject/twint/tarball/master";
 		src = "https://github.com/ihsanturk/twint/tarball/master";
-		overridesPre = [(
-			pySelf: pySuper: {
-				dateutil = null;
-			}
-		)];
+		overridesPre = [( pySelf: pySuper: { dateutil = null; })];
 	};
 	twitter = pkgs.callPackage ./default.nix {
 		inherit twint lib;
