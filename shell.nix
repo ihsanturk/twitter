@@ -18,5 +18,8 @@ let
 in
 mkShell {
 	name = "twitter";
-	buildInputs = [ twitter ];
+	buildInputs = [
+		twitter
+		pkgs.python38Packages.redis
+	];
 }
