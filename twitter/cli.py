@@ -20,15 +20,11 @@ import twint
 import logging
 from docopt import docopt
 from twitter.util import *
+from twitter.redis_credentials import port, username, password, host
 
 logging.basicConfig(level=logging.DEBUG)
 debug = logging.debug
 
-# connect to redis #TODO#e: vip, get these values from cli arguments
-port = 0000 #TODO#c: delete
-username = '' #TODO#c: di'
-password = '' #TODO#c: di'
-host = '' #TODO#c: di'
 r = redis.Redis(username=username, password=password, host=host, port=port, ssl=True)
 
 # overwrite json method to store tweets in redis.
