@@ -1,5 +1,6 @@
-with import <nixpkgs> {};
+{ pkgs ? import <nixpkgs> {} }: with pkgs;
 let
+	lib = pkgs.lib;
 	mach-nix = import (builtins.fetchGit {
 		url = "https://github.com/DavHau/mach-nix";
 		ref = "refs/heads/master";
@@ -8,6 +9,7 @@ let
 	twint = mach-nix.buildPythonPackage {
 		# src = "https://github.com/twintproject/twint/tarball/master";
 		src = "https://github.com/ihsanturk/twint/tarball/master";
+		# src = ~/code/github.com/ihsanturk/twint;
 		overridesPre = [( pySelf: pySuper: { dateutil = null; })];
 	};
 	twitter = pkgs.callPackage ./default.nix {
@@ -19,7 +21,9 @@ in
 mkShell {
 	name = "twitter";
 	buildInputs = [
+		mongodb
 		twitter
-		pkgs.python38Packages.redis
+		# python38Packages.redis
+		python38Packages.pymongo
 	];
 }

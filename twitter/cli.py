@@ -12,27 +12,34 @@ Options:
 
 """
 
+# import redis
+# from twitter.redis_credentials import port, username, password, host
+
+from pymongo import MongoClient
+from twitter.mongo_credentials import port, username, password, host
+
 import sys
 import json
 import time
-import redis
 import twint
 import logging
 from docopt import docopt
 from twitter.util import *
-from twitter.redis_credentials import port, username, password, host
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG) #WARN)
 debug = logging.debug
 
-r = redis.Redis(username=username, password=password, host=host, port=port, ssl=True)
+# dbclient = redis.Redis(username=username, password=password, host=host, port=port, ssl=True)
+dbclient = MongoClient(f'mongodb://{host}:{port}')
+db = dbclient['twitter']
 
-# overwrite json method to store tweets in redis.
+# overwrite json method to store tweets in db.
 module = sys.modules["twint.storage.write"]
 def Json(obj, config):
-	tweet = obj.__dict__
-	# r.set('tweets.$company') #TODO#0: JSON.set('tweets.company.'+tweet) see: https://github.com/RedisJSON/redisjson-py
-	print(type(tweet), tweet)
+	tweet = obj.__dict__ # see: readme.md twint tweets section to see fields.
+	tweet['_id'] = tweet.pop('id'); # mongodb compatible id
+	print(tweet['username']+'\t'+tweet['_id']) #TODO#p: DELETE
+	# mongo_save(db.tweets, tweet)
 module.Json = Json
 
 def main():
@@ -49,19 +56,20 @@ def main():
 	c.Lang = arg['--lang']
 
 	# action
+	#TODO#1: db duplicate issue
 	while True:
 		for company in companies:
-			lp = get_lastpos(r, company)
-			if not lp: lp = init_lastpos(r, company)
+			lp = get_lastpos(db.info, company)
+			if not lp:
+				debug(f"can't find last position value for {company}")
+				lp = init_lastpos(db.info, company)
+			print(lp)
 			c.Search = company
 			c.Since = lp
-			tweet = twint.run.Search(c)
-			time.sleep(1)
-			# redis.JSON.set(company, tweet, lp) #TODO#0
-
-			# #TODO#1: queue mechanism for getting like after t+5m, t+10m t+15m
-			# redis_push_queue(after_5_min, company)
-
+			twint.run.Search(c)
+			set_lastpos(db.lastpos, company, twint.output.tweet_list[0].datetime)
+			# #TODO#2: queue mechanism for getting like after t+5m, t+10m t+15m
+			time.sleep(10) #TODO#p: DELETE
 
 	# # action
 	# lastpos = get_lastpos(r, company)
@@ -78,34 +86,6 @@ def main():
 	# 			sys.stderr.write(f'twint could not fetch the tweets for {arg["<query>"]}\n')
 	# 		time.sleep(1)
 
-
-def readfile(fl):
-	debug(f'reading file: {fl}')
-	try:
-		with open(fl) as f:
-			return f.read().splitlines()
-			f.close()
-	except FileNotFoundError:
-		yellerr(f'no such file or directory: {arg["<queryfile>"]}\n')
-		sys.exit(2)
-
-def set_lastpos(redis_client, query, date):
-	debug('setting last pos value')
-	lastpos = redis_client.set('lastpos:'+query, date)
-	return date
-
-def get_lastpos(redis_client, query):
-	#TODO#p: handle errors
-	debug('getting last pos value')
-	lastpos = redis_client.get('lastpos:'+query).decode("utf-8")
-	return lastpos
-
-def init_lastpos(redis_client, query):
-	debug('initializing last pos value')
-	p = '2000-01-01 00:00:00'
-	p = '2020-10-27 21:00:00' #TODO#p: dd
-	lastpos = redis_client.set('lastpos:'+query, p)
-	return p
 
 if __name__ == '__main__':
 	main()
