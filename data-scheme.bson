@@ -1,0 +1,84 @@
+# ===V2========================================================================
+# db.tweets --------------------------
+{ "..." },
+{
+	"_id": "<tweetid>",
+	"text": "<text>",
+	"username": "<username>",
+	"timestamp": "<timestamp>",
+	"likecount": {
+		"0": "<likecount>",
+		"300": "<likecount>",
+		"600": "<likecount>",
+		"900": "<likecount>"
+	},
+	"likeretweet": {
+		"0": "<retweetcount>",
+		"300": "<retweetcount>",
+		"600": "<retweetcount>",
+		"900": "<retweetcount>"
+	}
+}
+{ "..." },
+
+# db.info-----------------------------
+{ "..." }
+{
+  "_id": "thyao",
+  "lastpos": "<date>", # TODO: use date object instead of string to filter by logical expressions. In that case you should get_lastpos
+  "tweetids": [11234, 54326, 45243] # NOTE: Use $addToSet while appending, the $addToSet operator adds a value to an array unless the value is already present, in which case $addToSet does nothing to that array. See: https://docs.mongodb.com/manual/reference/operator/update/addToSet/
+}
+{ "..." }
+
+# db.analytics------------------------
+{ "..." }
+{ "_id": "thyao", "count_positive": "<int>", "count_negative": "<int>" }
+{ "..." }
+
+
+# ===V1========================================================================
+# db.tweets --------------------------
+[
+	"adel": { "..." },
+	"thyao": {
+		"info": {
+			"lastpos": "<datestring>",
+			"score": "<int>",
+		},
+		"tweets": [
+			{
+				"_id": "<tweetid>",
+				"text": "<text>",
+				"username": "<username>",
+				"timestamp": "<timestamp>",
+				"likecount": {
+					"0": "<likecount>",
+					"300": "<likecount>",
+					"600": "<likecount>",
+					"900": "<likecount>"
+				},
+				"likeretweet": {
+					"0": "<retweetcount>",
+					"300": "<retweetcount>",
+					"600": "<retweetcount>",
+					"900": "<retweetcount>"
+				}
+			}
+		]
+	},
+	"another": { "..." }
+]
+
+# ===V0========================================================================
+# db.tweets --------------------------
+# TODO: Fix wrong fields
+{ "..." },
+{
+	"_id": "<tweetid>",
+	"text": "<text>",
+	"username": "<username>",
+	"timestamp": "<timestamp>",
+	"likecount": "<likecount>",
+	"likeretweet": "<retweetcount>",
+}
+{ "..." },
