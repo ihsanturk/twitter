@@ -56,14 +56,12 @@ def main():
 	c.Lang = arg['--lang']
 
 	# action
-	#TODO#1: db duplicate issue
+	#TODO#0: db duplicate issue
 	while True:
 		for company in companies:
 			lp = get_lastpos(db.info, company)
-			if not lp:
-				debug(f"can't find last position value for {company}")
-				lp = init_lastpos(db.info, company)
-			print(lp)
+			if not lp: lp = init_lastpos(db.info, company)
+			print(lp) #TODO#p: delete
 			c.Search = company
 			c.Since = lp
 			twint.run.Search(c)

@@ -15,7 +15,7 @@ def readfile(fl):
 		logging.error(f'no such file or directory: {arg["<queryfile>"]}\n')
 		sys.exit(2)
 
-# mongo -----------------------------------------------------------------------
+# mongo ---------------------------------------------------------------------
 def init_lastpos(coll, query):
 	debug(f'initializing last pos value for {query}')
 	date = '2000-01-01 00:00:00'
@@ -31,13 +31,16 @@ def set_lastpos(coll, query, date):
 	except pymongo.errors.ServerSelectionTimeoutError:
 		logging.critical(f'could not connected to mongodb')
 		sys.exit(2)
+	# except pymongo.errors.DuplicateError: #TODO:e Add the correct error
+		# return -1
 
 def get_lastpos(coll, query):
 	#TODO#0: convert from date object to string.
 	debug(f'getting last pos value for {query}')
 	try:
 		date = coll.find_one({"_id": query}, { 'lastpos': 1, '_id': 0 })
-		return date
+		if not date: debug(f"can't get last position value for {query}")
+		return None
 	except pymongo.errors.ServerSelectionTimeoutError:
 		logging.critical(f'could not connected to mongodb')
 		sys.exit(2)
@@ -45,7 +48,7 @@ def get_lastpos(coll, query):
 def mongo_save(coll, data):
 	coll.insert_one(data)
 
-# # redis ---------------------------------------------------------------------
+# # redis -------------------------------------------------------------------
 # def set_lastpos(redis_client, query, date):
 # 	debug('setting last pos value', date)
 # 	lastpos = redis_client.set('lastpos:'+query, date)
