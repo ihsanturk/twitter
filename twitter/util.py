@@ -52,26 +52,3 @@ def mongo_save(mongocollection, document):
 	print(document['datetime'])
 	# mongocollection.(document)
 
-
-# # redis -------------------------------------------------------------------
-# def set_lastpos(redis_client, query, date):
-# 	debug('setting last pos value', date)
-# 	lastpos = redis_client.set('lastpos:'+query, date)
-# 	return date
-
-# def get_lastpos(redis_client, query):
-# 	#TODO#p: handle errors
-# 	debug('getting last pos value for ', query)
-# 	lastpos = redis_client.get('lastpos:'+query).decode("utf-8")
-# 	return lastpos
-
-# def init_lastpos(redis_client, query):
-# 	debug('initializing last pos value for', query)
-# 	p = '2000-01-01 00:00:00'
-# 	p = '2020-10-27 21:00:00' #TODO#p: dd
-# 	lastpos = redis_client.set('lastpos:'+query, p)
-# 	return p
-
-# def redis_save(query, value, lastpos):
-# 	print('redis_save: unimplemented')
-
