@@ -19,8 +19,6 @@ def lastposf(mongocollection, query):
 	try:
 		return get_lastpos(mongocollection, query)
 	except twitter.error.NoLastPositionData:
-		sys.stderr.write('OH MY UNT') #TODO#p: dd
-		sys.exit(2)
 		return init_lastpos(mongocollection, query)
 
 def init_lastpos(mongocollection, query):
