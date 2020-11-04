@@ -7,8 +7,8 @@ let
 		rev = "3acbfc2ebd0b826cd046925493714a5e2f146d73";
 	}) {};
 	twint = mach-nix.buildPythonPackage {
-		# src = "https://github.com/twintproject/twint/tarball/master";
-		src = "https://github.com/ihsanturk/twint/tarball/master";
+		src = "https://github.com/twintproject/twint/tarball/ae5e7e1189be1cf319bbd55b921aca6bfb899f8c";
+		# src = "https://github.com/ihsanturk/twint/tarball/master";
 		# src = ~/code/github.com/ihsanturk/twint;
 		overridesPre = [( pySelf: pySuper: { dateutil = null; })];
 	};
