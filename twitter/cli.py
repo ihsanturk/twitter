@@ -65,8 +65,17 @@ def main():
 				lastpos = set_lastpos(lastpos_path, lt.datestamp+' '+lt.timestamp)
 				set_lastpos(db.lastpos, query, twint.output.tweet_list[0].datetime)
 			except IndexError:
-				sys.stderr.write(f'twint could not fetch the tweets for {arg["<query>"]}\n')
+				sys.stderr.write(f'twint could not fetch the tweets for {query}\n')
+			except Exception as e:
+				break
+
+import signal
+def signal_handler(sig, frame): # clean up code
+	print('killing...')
+	sys.exit(0)
 
 if __name__ == '__main__':
+	signal.signal(signal.SIGINT, signal_handler)
 	main()
+	signal.pause()
 
