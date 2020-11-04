@@ -15,7 +15,14 @@ def readfile(fl):
 		logging.error(f'no such file or directory: {arg["<queryfile>"]}\n')
 		sys.exit(2)
 
-# mongo ---------------------------------------------------------------------
+def lastposf(mongocollection, query):
+	try:
+		return get_lastpos(mongocollection, query)
+	except twitter.error.NoLastPositionData:
+		sys.stderr.write('OH MY UNT') #TODO#p: dd
+		sys.exit(2)
+		return init_lastpos(mongocollection, query)
+
 def init_lastpos(mongocollection, query):
 	debug(f'initializing last pos value for {query}')
 	date = '2000-01-01 00:00:00'
