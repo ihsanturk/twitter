@@ -45,15 +45,22 @@ def get_lastpos(mongocollection, query):
 	#TODO#0: convert from date object to string.
 	debug(f'getting last pos value for {query}')
 	try:
-		date = mongocollection.find_one({"_id": query}, {'lastpos': 1, '_id':
-			0})['lastpos']
+		date = mongocollection.find_one({"_id": query}, {'lastpos': 1, '_id': 0})['lastpos']
 		if not date: raise twitter.error.NoLastPositionData(query)
 	except pymongo.errors.ServerSelectionTimeoutError:
 		logging.critical(f'could not connected to mongodb')
 		sys.exit(2)
 	return date
 
-def mongo_save(mongocollection, document):
-	print(document['datetime'])
-	# mongocollection.(document)
+def mongo_save(db, document):
+	debug(f'saving: {document}')
+	try:
+		db.tweets.insert_one(document)
+		# TODO#0: store tweet ids in info ids
+		# TODO#0: Json method cant get query parameter so how to store company names in the info collection.
+		# NOTE#0: don't index hashtag array, it may not include the company symbol.
+		# db.info.update_one({"_id": query}, { '$push': { 'tweetids': document } })
+	except pymongo.errors.DuplicateKeyError:
+		# logging.error('duplication')
+		pass
 

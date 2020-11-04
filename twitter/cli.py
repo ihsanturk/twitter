@@ -33,7 +33,7 @@ module = sys.modules["twint.storage.write"]
 def Json(obj, config):
 	tweet = obj.__dict__ # see: readme.md twint tweets section to see fields.
 	tweet['_id'] = tweet.pop('id'); # mongodb compatible id
-	mongo_save(db.tweets, tweet)
+	mongo_save(db, tweet)
 module.Json = Json
 
 def main():
@@ -43,6 +43,7 @@ def main():
 	# twint config
 	c = twint.Config()
 	c.Store_json = True
+	c.Store_object = True
 	c.Output = "tweets.json" # just to satisfy the twint, not acutal write.
 	# c.Custom["tweet"] = ['id', 'username', 'date', 'time', 'timezone',
 	# 	'language', 'geo', 'link', 'replies', 'retweets', 'likes', 'tweet']
@@ -57,13 +58,10 @@ def main():
 			c.Search = query
 			c.Since = lastposf(db.info, query)
 			twint.run.Search(c)
-			set_lastpos(db.lastpos, query, twint.output.tweets_list[0].datetime)
-			time.sleep(10) #TODO#p: delete
-			print(twint.output.tweets_list[0].datetime) #TODO#p: dd
 			try:
 				lt = twint.output.tweets_list[0] # latest tweet
-				lastpos = set_lastpos(lastpos_path, lt.datestamp+' '+lt.timestamp)
-				set_lastpos(db.lastpos, query, twint.output.tweet_list[0].datetime)
+				set_lastpos(db.lastpos, query, lt.datetime)
+				time.sleep(10) #TODO#p: delete
 			except IndexError:
 				sys.stderr.write(f'twint could not fetch the tweets for {query}\n')
 			except Exception as e:
