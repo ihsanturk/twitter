@@ -20,6 +20,7 @@ import logging
 import twitter.error
 from docopt import docopt
 from twitter.util import *
+from datetime import datetime
 from pymongo import MongoClient
 from twitter.mongo_credentials import port, username, password, host
 
@@ -33,7 +34,11 @@ module = sys.modules["twint.storage.write"]
 def Json(obj, config):
 	tweet = obj.__dict__ # see: readme.md twint tweets section to see fields.
 	tweet['_id'] = tweet.pop('id'); # mongodb compatible id
-	mongo_save(db, tweet)
+	tweet['datetime'] = datetime.strptime(tweet.pop('datetime'), '%Y-%m-%d %H:%M:%S %Z')
+	tweet['captured_datetime'] = datetime.now();
+	delta = tweet['captured_datetime'] - tweet['datetime']
+	tweet['captured_delay_sec'] = delta.total_seconds()
+	mongo_save(db, tweet, config.Search)
 module.Json = Json
 
 def main():
@@ -45,8 +50,6 @@ def main():
 	c.Store_json = True
 	c.Store_object = True
 	c.Output = "tweets.json" # just to satisfy the twint, not acutal write.
-	# c.Custom["tweet"] = ['id', 'username', 'date', 'time', 'timezone',
-	# 	'language', 'geo', 'link', 'replies', 'retweets', 'likes', 'tweet']
 	c.Hide_output = True
 	c.Lang = arg['--lang']
 	c.Limit = 1; #TODO#p: dd
@@ -70,7 +73,7 @@ def main():
 
 import signal
 def signal_handler(sig, frame): # clean up code
-	sys.stderr.write('killing...')
+	sys.stderr.write('killing...\n')
 	sys.exit(0)
 
 if __name__ == '__main__':
