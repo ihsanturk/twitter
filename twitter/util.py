@@ -32,7 +32,9 @@ def set_lastpos(mongocollection, query, date):
 	debug(f'setting last pos value for {query} to {date}')
 	d = { "_id": query, "lastpos": date }
 	# try:
-	if mongocollection.replace_one(d, d, True).raw_result['ok'] == 1.0:
+	server_result = mongocollection.replace_one(d, d, True)
+	if server_result.raw_result['ok'] == 1.0:
+		debug(f'replace_one() server result: {server_result}')
 		return date
 	else:
 		raise Exception() # TODO#2: dd
@@ -50,6 +52,7 @@ def get_lastpos(mongocollection, query):
 	except pymongo.errors.ServerSelectionTimeoutError:
 		logging.critical(f'could not connected to mongodb')
 		sys.exit(2)
+	debug(f'last pos value for {query} is {date}')
 	return date
 
 def mongo_save(db, document):
@@ -63,4 +66,6 @@ def mongo_save(db, document):
 	except pymongo.errors.DuplicateKeyError:
 		# logging.error('duplication')
 		pass
+	else:
+		print(document['link'])
 
