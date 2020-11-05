@@ -49,18 +49,19 @@ def main():
 	# 	'language', 'geo', 'link', 'replies', 'retweets', 'likes', 'tweet']
 	c.Hide_output = True
 	c.Lang = arg['--lang']
+	c.Limit = 1; #TODO#p: dd
 
 	# action
 	while True:
 
-		#TODO#2: queue mechanism for getting like after t+5m, t+10m t+15m
+		#TODO#0: queue mechanism for getting like after t+5m, t+10m t+15m
 		for query in queries:
 			c.Search = query
 			c.Since = lastposf(db.info, query)
 			twint.run.Search(c)
 			try:
 				lt = twint.output.tweets_list[0] # latest tweet
-				set_lastpos(db.lastpos, query, lt.datetime)
+				set_lastpos(db.info, query, lt.datetime)
 				time.sleep(10) #TODO#p: delete
 			except IndexError:
 				sys.stderr.write(f'twint could not fetch the tweets for {query}\n')
@@ -69,7 +70,7 @@ def main():
 
 import signal
 def signal_handler(sig, frame): # clean up code
-	print('killing...')
+	sys.stderr.write('killing...')
 	sys.exit(0)
 
 if __name__ == '__main__':
@@ -77,3 +78,5 @@ if __name__ == '__main__':
 	main()
 	signal.pause()
 
+# # file approach
+# set_lastpos(lastpos_path, lt.datestamp+' '+lt.timestamp)
