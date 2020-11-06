@@ -28,11 +28,11 @@ def init_lastpos(mongocollection, query):
 	return set_lastpos(mongocollection, query, date)
 
 def set_lastpos(mongocollection, query, date):
-	#TODO#1: store date as python date object.
 	debug(f'setting last pos value for {query} to {date}')
-	d = { "_id": query, "lastpos": date }
+	a = { "_id": query }
+	b = { "_id": query, "lastpos": date }
 	# try:
-	server_result = mongocollection.replace_one(d, d, True)
+	server_result = mongocollection.replace_one(a, b, True)
 	if server_result.raw_result['ok'] == 1.0:
 		debug(f'replace_one() server result: {server_result}')
 		return date
