@@ -34,7 +34,7 @@ module = sys.modules["twint.storage.write"]
 def Json(obj, config):
 	tweet = obj.__dict__ # see: readme.md twint tweets section to see fields.
 	tweet['_id'] = tweet.pop('id'); # mongodb compatible id
-	tweet['datetime'] = datetime.strptime(tweet.pop('datetime'), '%Y-%m-%d %H:%M:%S %Z')
+	tweet['datetime'] = datetime.strptime(tweet.pop('datetime'), '%Y-%m-%d %H:%M:%S %Z') # convert string date to date object
 	tweet['captured_datetime'] = datetime.now();
 	delta = tweet['captured_datetime'] - tweet['datetime']
 	tweet['captured_delay_sec'] = delta.total_seconds()
@@ -42,7 +42,10 @@ def Json(obj, config):
 module.Json = Json
 
 def main():
-	arg = docopt(__doc__, version='0.0.1')
+
+	#FIXME#0: search: if username includes our query it will saved like the name: aslan
+
+	arg = docopt(__doc__, version='0.1.0')
 	queries = readfile(arg['<queryfile>'])
 
 	# twint config
@@ -57,15 +60,21 @@ def main():
 	# action
 	while True:
 
-		#TODO#0: queue mechanism for getting like after t+5m, t+10m t+15m
+		#TODO#1: queue mechanism for getting like after t+5m, t+10m t+15m
 		for query in queries:
 			c.Search = query
 			c.Since = lastposf(db.info, query)
 			twint.run.Search(c)
 			try:
 				lt = twint.output.tweets_list[0] # latest tweet
+
+				#TODO#p: dap
+				print()
+				print(f'lt: {lt.tweet}')
+				print()
+
 				set_lastpos(db.info, query, lt.datetime)
-				time.sleep(10) #TODO#p: delete
+				# time.sleep(10) #TODO#p: delete
 			except IndexError:
 				sys.stderr.write(f'twint could not fetch the tweets for {query}\n')
 			except Exception as e:

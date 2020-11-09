@@ -47,7 +47,7 @@ def get_lastpos(mongocollection, query):
 	#TODO#1: convert from date object to string.
 	debug(f'getting last pos value for {query}')
 	try:
-		result = mongocollection.find_one({"_id": query}, {'lastpos': 1, '_id': 0})
+		result = mongocollection.find_one({"_id":query}, {'lastpos': 1, '_id': 0})
 		if not result: raise twitter.error.NoLastPositionData(query)
 	except pymongo.errors.ServerSelectionTimeoutError:
 		logging.critical(f'could not connected to mongodb')
