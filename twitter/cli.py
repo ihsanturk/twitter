@@ -19,6 +19,7 @@ import twint
 import logging
 import twitter.error
 from docopt import docopt
+import asyncio.exceptions
 from twitter.util import *
 from datetime import datetime
 from pymongo import MongoClient
@@ -65,8 +66,12 @@ def main():
 		#TODO#1: queue mechanism for getting like after t+5m, t+10m t+15m
 		for query in queries:
 			c.Search = query
-			c.Since = lastposf(db.info, query)
-			twint.run.Search(c)
+			c.Since = str(lastposf(db.info, query))
+			print(f'last position for {query}: {c.Since}') #NOTE: toggle uncomment
+			try:
+				twint.run.Search(c)
+			except asyncio.exceptions.TimeoutError:
+				continue
 			try:
 				lt = twint.output.tweets_list[0] # latest tweet
 
@@ -79,8 +84,10 @@ def main():
 				# time.sleep(10) #TODO#p: delete
 			except IndexError:
 				sys.stderr.write(f'twint could not fetch the tweets for {query}\n')
-			except Exception as e:
-				break
+			# except Exception as e:
+			# 	break
+
+			twint.output.clean_lists()
 
 import signal
 def signal_handler(sig, frame): # clean up code
