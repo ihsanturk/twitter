@@ -60,10 +60,10 @@ def mongo_save(db, document, query):
 	debug(f'saving: {document}')
 	try:
 		db.tweets.insert_one(document)
+		# db.info.update_one({"_id":query}, {'$addToSet':{'tweetids':document['_id']}}) # using create_index() instead #TODO#p: dd
 	except pymongo.errors.DuplicateKeyError:
 		# logging.error('duplication')
 		pass
 	else: # not a duplicate
-		db.info.update_one({"_id": query}, { '$push': { 'tweetids': document['_id'] } })
 		print(document['link'])
 

@@ -55,7 +55,9 @@ def main():
 	c.Output = "tweets.json" # just to satisfy the twint, not acutal write.
 	c.Hide_output = True
 	c.Lang = arg['--lang']
-	c.Limit = 1; #TODO#p: dd
+	# c.Limit = 1; #TODO#p: dd
+
+	db.tweets.create_index([("tweet", pymongo.TEXT)], background=True) # respects if exists
 
 	# action
 	while True:
