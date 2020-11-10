@@ -44,8 +44,6 @@ module.Json = Json
 
 def main():
 
-	#FIXME#0: search: if username includes our query it will saved like the name: aslan
-
 	arg = docopt(__doc__, version='0.1.0')
 	queries = readfile(arg['<queryfile>'])
 

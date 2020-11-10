@@ -2,8 +2,10 @@ import sys
 import logging
 import pymongo
 import twitter.error
+# from confusables import normalize
 
 debug = logging.debug
+info  = logging.info
 
 def readfile(fl):
 	debug(f'reading file: {fl}')
@@ -44,7 +46,6 @@ def set_lastpos(mongocollection, query, date):
 		# sys.exit(2)
 
 def get_lastpos(mongocollection, query):
-	#TODO#1: convert from date object to string.
 	debug(f'getting last pos value for {query}')
 	try:
 		result = mongocollection.find_one({"_id":query}, {'lastpos': 1, '_id': 0})
@@ -57,13 +58,26 @@ def get_lastpos(mongocollection, query):
 	return date
 
 def mongo_save(db, document, query):
-	debug(f'saving: {document}')
+	info(f'saving: {document}')
+	if not includes(query, document['tweet']): return
 	try:
 		db.tweets.insert_one(document)
-		# db.info.update_one({"_id":query}, {'$addToSet':{'tweetids':document['_id']}}) # using create_index() instead #TODO#p: dd
 	except pymongo.errors.DuplicateKeyError:
-		# logging.error('duplication')
 		pass
 	else: # not a duplicate
-		print(document['link'])
+		print(document['link'], document['username'], document['tweet'], sep='\t')
+
+def includes(x, y):
+	info(f'checking whether or not {y} includes {x}')
+	if x.lower() in y.lower():
+		info(f'yes, `{y}` includes `{x}`.')
+		return True
+	else:
+		info(f"no, `{y}` does not include `{x}`")
+		return False
+
+	# # FIXME: normalize('YEŞİL') -> ['#yefil', '#yefll', '#yesil', '#yesll']
+	# if x.lower() in y.lower(): return True
+	# # elif x.lower() in normalize(y, prioritize_alpha=True)[0]: return True
+	# else: return False
 

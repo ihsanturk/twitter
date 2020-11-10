@@ -17,13 +17,16 @@ let
 		docopt = pkgs.python38Packages.docopt;
 		buildPythonPackage = pkgs.python38Packages.buildPythonPackage;
 	};
+	# confusables = mach-nix.buildPythonPackage {
+	# 	src = "https://github.com/woodgern/confusables/tarball/master";
+	# };
 in
 mkShell {
 	name = "twitter";
 	buildInputs = [
 		mongodb
 		twitter
-		# python38Packages.redis
+		confusables
 		python38Packages.pymongo
 	];
 }
