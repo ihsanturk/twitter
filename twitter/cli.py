@@ -42,6 +42,8 @@ def Json(obj, config):
 	mongo_save(db, tweet, config.Search)
 module.Json = Json
 
+now = lambda: str(datetime.now()).split('.')[0]
+
 def main():
 
 	arg = docopt(__doc__, version='0.1.0')
@@ -70,20 +72,14 @@ def main():
 				twint.run.Search(c)
 			except asyncio.exceptions.TimeoutError:
 				continue
-			try:
+			try: #TODO#0: check if len(twint.output.tweets_list) > 0:
 				lt = twint.output.tweets_list[0] # latest tweet
-
-				#TODO#p: dap
-				print()
-				print(f'lt: {lt.tweet}')
-				print()
-
+				print(f'\nlt: {lt.tweet}\n')
 				set_lastpos(db.info, query, lt.datetime)
 				# time.sleep(10) #TODO#p: delete
 			except IndexError:
-				sys.stderr.write(f'twint could not fetch the tweets for {query}\n')
-			# except Exception as e:
-			# 	break
+				sys.stderr.write(f'no tweets found: {query}')
+				set_lastpos(db.info, query, now())
 
 			twint.output.clean_lists()
 
@@ -95,7 +91,3 @@ def signal_handler(sig, frame): # clean up code
 if __name__ == '__main__':
 	signal.signal(signal.SIGINT, signal_handler)
 	main()
-	signal.pause()
-
-# # file approach
-# set_lastpos(lastpos_path, lt.datestamp+' '+lt.timestamp)

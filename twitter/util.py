@@ -60,10 +60,8 @@ def get_lastpos(mongocollection, query):
 def mongo_save(db, document, query):
 	info(f'saving: {document}')
 	if not includes(query, document['tweet']): return
-	try:
-		db.tweets.insert_one(document)
-	except pymongo.errors.DuplicateKeyError:
-		pass
+	try: db.tweets.insert_one(document)
+	except pymongo.errors.DuplicateKeyError: pass
 	else: # not a duplicate
 		print(document['link'], document['username'], document['tweet'], sep='\t')
 
@@ -75,7 +73,6 @@ def includes(x, y):
 	else:
 		info(f"no, `{y}` does not include `{x}`")
 		return False
-
 	# # FIXME: normalize('YEŞİL') -> ['#yefil', '#yefll', '#yesil', '#yesll']
 	# if x.lower() in y.lower(): return True
 	# # elif x.lower() in normalize(y, prioritize_alpha=True)[0]: return True

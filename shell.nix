@@ -26,7 +26,7 @@ mkShell {
 	buildInputs = [
 		mongodb
 		twitter
-		confusables
+		# confusables
 		python38Packages.pymongo
 	];
 }

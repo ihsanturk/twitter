@@ -1,4 +1,4 @@
-# Twitter Scraper & Streamer
+# Twitter Scraper & Stream
 
 [![built with nix](https://builtwithnix.org/badge.svg)](https://builtwithnix.org)
 
