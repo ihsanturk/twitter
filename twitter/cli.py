@@ -23,6 +23,7 @@ import asyncio.exceptions
 from twitter.util import *
 from datetime import datetime
 from pymongo import MongoClient
+from concurrent.futures import ThreadPoolExecutor
 from twitter.mongo_credentials import port, username, password, host
 
 debug = logging.debug
@@ -36,42 +37,35 @@ def main():
 
 	arg = docopt(__doc__, version='0.1.0')
 	queries = readfile(arg['<queryfile>'])
-
-	# twint config
-	c = twint.Config()
-	c.Store_json = True
-	c.Store_object = True
-	c.Output = "tweets.json" # just to satisfy the twint, not acutal write.
-	c.Hide_output = True
-	c.Lang = arg['--lang']
-
 	db.tweets.create_index([("tweet", pymongo.TEXT)], # respects if exists
 		background=True)
 
-	# TODO: Create list of twint.Config for every query and use threadpool.
-	# config_list = [ c for c in queries ]
-
 	# action
-	while True:
+	#TODO#0: while loop: vip
+	config_list = [
+		twint.Config(Search=q, Store_json=True, Store_object=True,
+		Output="tweets.json", Hide_output = True, Lang = arg['--lang'])
+		for q in queries
+	]
+	with ThreadPoolExecutor(max_workers=20) as executor:
+		executor.map(fetch, config_list)
+		executor.shutdown(wait=True)
 
-		#TODO#1: queue mechanism for getting like after t+5m, t+10m t+15m
-		for query in queries:
-			c.Search = query
-			c.Since = str(lastposf(db.info, query))
-			print(f'last position for {query}: {c.Since}') #NOTE: toggle uncomment
-			try:
-				twint.run.Search(c)
-			except asyncio.exceptions.TimeoutError:
-				continue
-			try: #TODO#p: check if len(twint.output.tweets_list) > 0:
-				lt = twint.output.tweets_list[0] # latest tweet
-				print(f'\nlt: {lt.tweet}\n')
-				set_lastpos(db.info, query, lt.datetime)
-			except IndexError:
-				sys.stderr.write(f'no tweets found: {query}')
-				set_lastpos(db.info, query, now())
+	print('END') #TODO#: dd
 
-			twint.output.clean_lists()
+def fetch(c):
+	c.Since = str(lastposf(db.info, c.Search))
+	print(f'{c.Search} since {c.Since}')
+	# try:
+	twint.run.Search(c)
+	# except asyncio.exceptions.TimeoutError: pass
+	try:
+		lt = twint.output.tweets_list[0] # latest tweet
+		set_lastpos(db.info, c.Search, lt.datetime)
+	except IndexError:
+		sys.stderr.write(f'no tweets found: {query}')
+		set_lastpos(db.info, c.Search, now())
+	twint.output.clean_lists()
 
 # overwrite json method to store tweets in db.
 module = sys.modules["twint.storage.write"]
