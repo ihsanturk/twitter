@@ -27,7 +27,7 @@ from concurrent.futures import ThreadPoolExecutor
 from twitter.mongo_credentials import port, username, password, host
 
 debug = logging.debug
-logging.basicConfig(level=logging.WARN) #DEBUG)
+logging.basicConfig(level=logging.ERROR) #INFO) #DEBUG)
 dbclient = MongoClient(f'mongodb://{host}:{port}')
 db = dbclient['twitter']
 
