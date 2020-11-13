@@ -70,7 +70,7 @@ def mongo_save(db, document, query):
 
 def includes(x, y):
 	info(f'checking whether or not {y} includes {x}')
-	if x.lower() in y.lower():
+	if x.lower() in wo_mentions(y.lower()):
 		info(f'YES, `{y}` includes `{x}`.')
 		return True
 	else:
@@ -80,4 +80,6 @@ def includes(x, y):
 	# if x.lower() in y.lower(): return True
 	# # elif x.lower() in normalize(y, prioritize_alpha=True)[0]: return True
 	# else: return False
+
+wo_mentions = lambda t: " ".join(filter(lambda x: x[0]!='@', t.split()))
 
