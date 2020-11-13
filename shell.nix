@@ -27,6 +27,7 @@ mkShell {
 		mongodb
 		twitter
 		# confusables
+		mongodb-tools
 		python38Packages.pymongo
 	];
 }
