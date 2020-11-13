@@ -28,7 +28,7 @@ def lastposf(mongocollection, query):
 def init_lastpos(mongocollection, query):
 	debug(f'initializing last pos value for {query}')
 	date = '2000-01-01 00:00:00'
-	date = '2020-11-02 15:00:00' #TODO#p: dd
+	# date = '2020-11-02 15:00:00' #TODO#p: dd
 	return set_lastpos(mongocollection, query, date)
 
 def set_lastpos(mongocollection, query, date):
@@ -60,20 +60,21 @@ def get_lastpos(mongocollection, query):
 	return date
 
 def mongo_save(db, document, query):
-	info(f'saving: {document}')
+	# info(f'saving: {document}')
 	if not includes(query, document['tweet']): return
 	try: db.tweets.insert_one(document)
 	except pymongo.errors.DuplicateKeyError: pass
 	else: # not a duplicate
-		print(document['link'], document['username'], document['tweet'], sep='\t')
+		print(f'{document[capture_delay_sec]:4.4f}',
+			query, document["tweet"], sep='\t')
 
 def includes(x, y):
 	info(f'checking whether or not {y} includes {x}')
 	if x.lower() in y.lower():
-		info(f'yes, `{y}` includes `{x}`.')
+		info(f'YES, `{y}` includes `{x}`.')
 		return True
 	else:
-		info(f"no, `{y}` does not include `{x}`")
+		warn(f"NO, `{y}` does not include `{x}`")
 		return False
 	# # FIXME: normalize('YEŞİL') -> ['#yefil', '#yefll', '#yesil', '#yesll']
 	# if x.lower() in y.lower(): return True
