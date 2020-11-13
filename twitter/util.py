@@ -2,10 +2,12 @@ import sys
 import logging
 import pymongo
 import twitter.error
+from color import Colors as color
 # from confusables import normalize
 
 debug = logging.debug
-info  = logging.info
+info  = lambda m: logging.info(f'{color.BLUE}{m}{color.END}')
+warn  = lambda m: logging.warn(f'{color.RED}{m}{color.END}')
 
 def readfile(fl):
 	debug(f'reading file: {fl}')
