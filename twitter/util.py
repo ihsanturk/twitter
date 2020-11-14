@@ -20,8 +20,7 @@ def readfile(fl):
 		sys.exit(2)
 
 def lastposf(mongocollection, query):
-	try:
-		return get_lastpos(mongocollection, query)
+	try: return get_lastpos(mongocollection, query)
 	except twitter.error.NoLastPositionData:
 		return init_lastpos(mongocollection, query)
 
