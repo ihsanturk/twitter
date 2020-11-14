@@ -32,13 +32,21 @@ dbclient = MongoClient(f'mongodb://{host}:{port}')
 db = dbclient['twitter']
 
 now = lambda: str(datetime.now()).split('.')[0]
+suggest = lambda e: sys.stderr.write('suggestion: '+twitter.error.suggestions[e]+'\n')
 
 def main():
 
 	arg = docopt(__doc__, version='0.1.0')
 	queries = readfile(arg['<queryfile>'])
-	db.tweets.create_index([("tweet", pymongo.TEXT)], # respects if exists
-		background=True)
+	while True:
+		try:
+			db.tweets.create_index([("tweet", pymongo.TEXT)], # respects if exists
+				background=True)
+			break
+		except pymongo.errors.ServerSelectionTimeoutError:
+			suggest("mongo_cannot_connect")
+			# notify_error_via_email() #NOTE: Not implemented
+			continue
 
 	# action
 	#TODO#0: while loop: vip

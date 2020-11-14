@@ -14,3 +14,6 @@ class NoLastPositionData(Exception):
 	def __str__(self):
 		return f'{self.query} -> {self.message}'
 
+suggestions = {
+	"mongo_cannot_connect": "start mongodb"
+}
