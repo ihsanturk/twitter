@@ -21,7 +21,6 @@ import twitter.error
 from docopt import docopt
 import asyncio.exceptions
 from twitter.util import *
-from datetime import datetime
 from pymongo import MongoClient
 from concurrent.futures import ThreadPoolExecutor
 from twitter.mongo_credentials import port, username, password, host
@@ -31,7 +30,6 @@ logging.basicConfig(level=logging.ERROR)
 dbclient = MongoClient(f'mongodb://{host}:{port}')
 db = dbclient['twitter']
 
-now = lambda: str(datetime.now()).split('.')[0]
 suggest = lambda e: sys.stderr.write('suggestion: '+twitter.error.suggestions[e]+'\n')
 
 def main():
@@ -62,7 +60,8 @@ def main():
 	print('END') #TODO#: dd
 
 def fetch(c):
-	c.Since = str(lastposf(db.info, c.Search))
+	c.Since = lastposf(db.info,
+		c.Search).astimezone(tz=timezone.utc).strftime(dateformat)
 	print(f'{c.Search} since {c.Since}')
 	try: twint.run.Search(c)
 	except asyncio.exceptions.TimeoutError as e: error(e); pass
@@ -73,20 +72,20 @@ def fetch(c):
 		except IndexError:
 			sys.stderr.write(f'no tweets found: {c.Search}')
 			set_lastpos(db.info, c.Search, now())
-		else: set_lastpos(db.info, c.Search, lt.datetime)
+		else: set_lastpos(db.info, c.Search, dateparse(f"{lt.datestamp} {lt.timestamp} {lt.timezone}"))
 	twint.output.clean_lists()
 
 # overwrite json method to store tweets in db.
 module = sys.modules["twint.storage.write"]
 def Json(obj, config):
-	tweet = obj.__dict__ # see: readme.md twint tweets section to see fields.
-	tweet['_id'] = tweet.pop('id'); # mongodb compatible id
-	tweet['datetime'] = datetime.strptime(tweet.pop('datetime'),
-		'%Y-%m-%d %H:%M:%S %Z') # convert string date to date object
-	tweet['captured_datetime'] = datetime.now();
-	delta = tweet['captured_datetime'] - tweet['datetime']
-	tweet['capture_delay_sec'] = delta.total_seconds()
-	mongo_save(db, tweet, config.Search)
+	t = obj.__dict__ # see: readme.md twint tweets section to see fields.
+	t['_id'] = t.pop('id'); # mongodb compatible id
+	datestring = f"{t['datestamp']} {t['timestamp']} {t['timezone']}"
+	t['datetime'] = dateparse(datestring)
+	t['captured_datetime'] = now()
+	delta = t['captured_datetime'] - t['datetime']
+	t['capture_delay_sec'] = delta.total_seconds()
+	mongo_save(db, t, config.Search)
 module.Json = Json
 
 import signal

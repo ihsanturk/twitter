@@ -59,3 +59,5 @@ Some of the meanings in the source code;
 [<class 'int'>]: _id: 1322510370129457152
 ```
 
+### Twint
+Twint expects the timezone of Since & Until arguments as **UTC**.

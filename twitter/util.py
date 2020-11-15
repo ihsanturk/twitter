@@ -2,13 +2,17 @@ import sys
 import logging
 import pymongo
 import twitter.error
+from datetime import datetime, timezone
 from twitter.color import Colors as color
 # from confusables import normalize
 
 debug = logging.debug
-error = logging.error
-warn  = lambda m: logging.warn(f'{color.RED}{m}{color.END}')
+error = lambda m: logging.error(f'{color.RED}{m}{color.END}')
 info  = lambda m: logging.info(f'{color.BLUE}{m}{color.END}')
+warn  = lambda m: logging.warn(f'{color.YELLOW}{m}{color.END}')
+dateparse = lambda d: datetime.strptime(d, '%Y-%m-%d %H:%M:%S %z')
+now = lambda: datetime.now(timezone.utc)
+dateformat = '%Y-%m-%d %H:%M:%S'
 
 def readfile(fl):
 	debug(f'reading file: {fl}')
@@ -27,8 +31,7 @@ def lastposf(mongocollection, query):
 
 def init_lastpos(mongocollection, query):
 	debug(f'initializing last pos value for {query}')
-	date = '2000-01-01 00:00:00'
-	# date = '2020-11-02 15:00:00' #TODO#p: dd
+	date = datetime(2000, 1, 1, 0, 0, 0)
 	return set_lastpos(mongocollection, query, date)
 
 def set_lastpos(mongocollection, query, date):
