@@ -26,8 +26,8 @@ from pymongo import MongoClient
 from concurrent.futures import ThreadPoolExecutor
 from twitter.mongo_credentials import port, username, password, host
 
-debug = logging.debug
-logging.basicConfig(level=logging.ERROR) #INFO) #DEBUG)
+max_thread_workers = 40 # 40:1m10s # 50:1m32s gives ocasianally warnings
+logging.basicConfig(level=logging.ERROR)
 dbclient = MongoClient(f'mongodb://{host}:{port}')
 db = dbclient['twitter']
 
@@ -47,7 +47,7 @@ def main():
 		Output="tweets.json", Hide_output = True, Lang = arg['--lang'])
 		for q in queries
 	]
-	with ThreadPoolExecutor(max_workers=20) as executor:
+	with ThreadPoolExecutor(max_workers=max_thread_workers) as executor:
 		executor.map(fetch, config_list)
 		executor.shutdown(wait=True)
 
@@ -56,15 +56,16 @@ def main():
 def fetch(c):
 	c.Since = str(lastposf(db.info, c.Search))
 	print(f'{c.Search} since {c.Since}')
-	# try:
-	twint.run.Search(c)
-	# except asyncio.exceptions.TimeoutError: pass
-	try:
-		lt = twint.output.tweets_list[0] # latest tweet
-		set_lastpos(db.info, c.Search, lt.datetime)
-	except IndexError:
-		sys.stderr.write(f'no tweets found: {query}')
-		set_lastpos(db.info, c.Search, now())
+	try: twint.run.Search(c)
+	except asyncio.exceptions.TimeoutError as e: error(e); pass
+	else:
+		try:
+			lt = twint.output.tweets_list[0] # latest tweet
+			print(f'tweet count: {len(twint.output.tweets_list)}') #TODO: dd
+		except IndexError:
+			sys.stderr.write(f'no tweets found: {c.Search}')
+			set_lastpos(db.info, c.Search, now())
+		else: set_lastpos(db.info, c.Search, lt.datetime)
 	twint.output.clean_lists()
 
 # overwrite json method to store tweets in db.

@@ -2,7 +2,7 @@ import sys
 import logging
 import pymongo
 import twitter.error
-from color import Colors as color
+from twitter.color import Colors as color
 # from confusables import normalize
 
 debug = logging.debug
