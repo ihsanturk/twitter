@@ -76,7 +76,7 @@ def Json(obj, config):
 		'%Y-%m-%d %H:%M:%S %Z') # convert string date to date object
 	tweet['captured_datetime'] = datetime.now();
 	delta = tweet['captured_datetime'] - tweet['datetime']
-	tweet['captured_delay_sec'] = delta.total_seconds()
+	tweet['capture_delay_sec'] = delta.total_seconds()
 	mongo_save(db, tweet, config.Search)
 module.Json = Json
 

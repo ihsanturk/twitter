@@ -6,8 +6,9 @@ from color import Colors as color
 # from confusables import normalize
 
 debug = logging.debug
-info  = lambda m: logging.info(f'{color.BLUE}{m}{color.END}')
+error = logging.error
 warn  = lambda m: logging.warn(f'{color.RED}{m}{color.END}')
+info  = lambda m: logging.info(f'{color.BLUE}{m}{color.END}')
 
 def readfile(fl):
 	debug(f'reading file: {fl}')
@@ -16,7 +17,7 @@ def readfile(fl):
 			return f.read().splitlines()
 			f.close()
 	except FileNotFoundError:
-		logging.error(f'no such file or directory: {arg["<queryfile>"]}\n')
+		error(f'no such file or directory: {arg["<queryfile>"]}\n')
 		sys.exit(2)
 
 def lastposf(mongocollection, query):
@@ -37,9 +38,8 @@ def set_lastpos(mongocollection, query, date):
 	b = { "_id": query, "lastpos": date }
 	# try:
 	server_result = mongocollection.replace_one(a, b, True)
-	if server_result.raw_result['ok'] == 1.0:
-		debug(f'replace_one() server result: {server_result}')
-		return date
+	debug(f'replace_one() server result: {server_result.raw_result}')
+	if server_result.raw_result['ok'] == 1.0: return date
 	else:
 		raise Exception() # TODO#2: dd
 		# raise CannotSetLastPos(mongocollection, query, date) TODO#2: add this to twitter/error.py
@@ -63,18 +63,18 @@ def mongo_save(db, document, query):
 	# info(f'saving: {document}')
 	if not includes(query, document['tweet']): return
 	try: db.tweets.insert_one(document)
-	except pymongo.errors.DuplicateKeyError: pass
+	except pymongo.errors.DuplicateKeyError: return
 	else: # not a duplicate
-		print(f'{document[capture_delay_sec]:4.4f}',
+		print(f'{document["capture_delay_sec"]:4.4f}',
 			query, document["tweet"], sep='\t')
 
 def includes(x, y):
-	info(f'checking whether or not {y} includes {x}')
+	debug(f'checking whether or not {y} includes {x}')
 	if x.lower() in wo_mentions(y.lower()):
-		info(f'YES, `{y}` includes `{x}`.')
+		info(f'YES {x}: `{y}`')
 		return True
 	else:
-		warn(f"NO, `{y}` does not include `{x}`")
+		warn(f"NO {x}: `{y}`")
 		return False
 	# # FIXME: normalize('YEŞİL') -> ['#yefil', '#yefll', '#yesil', '#yesll']
 	# if x.lower() in y.lower(): return True
