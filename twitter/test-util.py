@@ -15,12 +15,12 @@ class TestDbFunctions(unittest.TestCase):
 
 	def test_init_lastpos(s):
 		date = '2000-01-01 00:00:00'
-		date = '2020-11-02 15:00:00' #TODO#p: dd
+		# date = '2020-11-02 15:00:00' #TODO#p: dd
 		s.assertEqual(init_lastpos(s.db.tweets, s.c), date)
 
 	def test_set_get_lastpos(s):
-		set_lastpos(s.db['tweets'], s.c, "2020-11-02 20:00:57")
-		s.assertEqual(get_lastpos(s.db['tweets'], s.c), "2020-11-02 20:00:57")
+		set_lastpos(s.db['info'], s.c, "2020-11-02 20:00:57")
+		s.assertEqual(get_lastpos(s.db['info'], s.c), "2020-11-02 20:00:57")
 
 	def tearDown(s):
 		s.dbclient.drop_database('test-twitter')
