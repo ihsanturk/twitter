@@ -47,36 +47,38 @@ def main():
 			continue
 
 	# action
-	#TODO#0: while loop: vip
-	config_list = [
-		twint.Config(Search=q, Store_json=True, Store_object=True,
-		Output="tweets.json", Hide_output = True, Lang = arg['--lang'])
-		for q in queries
-	]
-	with ThreadPoolExecutor(max_workers=max_thread_workers) as executor:
-		executor.map(fetch, config_list)
-		executor.shutdown(wait=True)
-
-	print('END') #TODO#: dd
+	while True:
+		config_list = [
+			twint.Config(Search=q, Store_json=True, Store_object=True,
+			Output="tweets.json", Hide_output = True, Lang = arg['--lang'])
+			for q in queries
+		]
+		with ThreadPoolExecutor(max_workers=max_thread_workers) as executor:
+			executor.map(fetch, config_list)
+			executor.shutdown(wait=True)
+		print('END') #TODO#: dd
 
 def fetch(c):
-	c.Since = lastposf(db.info,
-		c.Search).astimezone(tz=timezone.utc).strftime(dateformat)
-	print(f'{c.Search} since {c.Since}')
+	lastpos_date = lastposf(db.info, c.Search).astimezone(tz=timezone.utc)
+	c.Since = lastpos_date.strftime(dateformat) # string
 	try: twint.run.Search(c)
 	except asyncio.exceptions.TimeoutError as e: error(e); pass
 	else:
 		try:
 			lt = twint.output.tweets_list[0] # latest tweet
-			print(f'tweet count: {len(twint.output.tweets_list)}') #TODO: dd
+			sys.stderr.write(f'{c.Search}: {len(twint.output.tweets_list)} new tweet(s) since {c.Since}\n')
 		except IndexError:
-			sys.stderr.write(f'no tweets found: {c.Search}')
+			sys.stderr.write(f'no tweets found: {c.Search}\n')
 			set_lastpos(db.info, c.Search, now())
 		else: set_lastpos(db.info, c.Search, dateparse(f"{lt.datestamp} {lt.timestamp} {lt.timezone}"))
 	twint.output.clean_lists()
 
+# no finished message should be
+class NoMoreTweetsException(Exception):
+	def __init__(self, msg): super().__init__()
+sys.modules["twint.feed"].NoMoreTweetsException = NoMoreTweetsException
+
 # overwrite json method to store tweets in db.
-module = sys.modules["twint.storage.write"]
 def Json(obj, config):
 	t = obj.__dict__ # see: readme.md twint tweets section to see fields.
 	t['_id'] = t.pop('id'); # mongodb compatible id
@@ -86,7 +88,7 @@ def Json(obj, config):
 	delta = t['captured_datetime'] - t['datetime']
 	t['capture_delay_sec'] = delta.total_seconds()
 	mongo_save(db, t, config.Search)
-module.Json = Json
+sys.modules["twint.storage.write"].Json = Json
 
 import signal
 def signal_handler(sig, frame): # clean up code

@@ -31,8 +31,7 @@ def lastposf(mongocollection, query):
 
 def init_lastpos(mongocollection, query):
 	debug(f'initializing last pos value for {query}')
-	date = datetime(2000, 1, 1, 0, 0, 0)
-	return set_lastpos(mongocollection, query, date)
+	return set_lastpos(mongocollection, query, now())
 
 def set_lastpos(mongocollection, query, date):
 	debug(f'setting last pos value for {query} to {date}')
