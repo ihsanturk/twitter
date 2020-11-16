@@ -87,7 +87,7 @@ def Json(obj, config):
 	t['captured_datetime'] = now()
 	delta = t['captured_datetime'] - t['datetime']
 	t['capture_delay_sec'] = delta.total_seconds()
-	mongo_save(db, t, config.Search)
+	mongo_save(db, t, config)
 sys.modules["twint.storage.write"].Json = Json
 
 import signal

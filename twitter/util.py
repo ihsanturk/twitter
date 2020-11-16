@@ -7,9 +7,9 @@ from twitter.color import Colors as color
 # from confusables import normalize
 
 debug = logging.debug
-error = lambda m: logging.error(f'{color.RED}{m}{color.END}')
 info  = lambda m: logging.info(f'{color.BLUE}{m}{color.END}')
 warn  = lambda m: logging.warn(f'{color.YELLOW}{m}{color.END}')
+wo_mentions = lambda t: " ".join(filter(lambda x: x[0]!='@', t.split()))
 dateparse = lambda d: datetime.strptime(d, '%Y-%m-%d %H:%M:%S %z')
 now = lambda: datetime.now(timezone.utc)
 dateformat = '%Y-%m-%d %H:%M:%S'
@@ -21,7 +21,7 @@ def readfile(fl):
 			return f.read().splitlines()
 			f.close()
 	except FileNotFoundError:
-		error(f'no such file or directory: {arg["<queryfile>"]}\n')
+		sys.stderr.write(f'no such file or directory: {arg["<queryfile>"]}\n')
 		sys.exit(2)
 
 def lastposf(mongocollection, query):
@@ -60,14 +60,22 @@ def get_lastpos(mongocollection, query):
 	debug(f'last pos value for {query} is {date}')
 	return date
 
-def mongo_save(db, document, query):
-	# info(f'saving: {document}')
-	if not includes(query, document['tweet']): return
+def mongo_save(db, document, config):
+	debug(f'saving: {document}')
+	if not filters_pass(config.Search, document['tweet'], config.Lang): return
 	try: db.tweets.insert_one(document)
 	except pymongo.errors.DuplicateKeyError: return
 	else: # not a duplicate
 		print(f'{document["capture_delay_sec"]:4.4f}',
-			query, document["tweet"], sep='\t')
+			config.Search, document["tweet"], sep='\t')
+
+def filters_pass(q, d, lang):
+	language_is(lang, d['lang']) and includes(q, d['tweet'])
+
+language_is = lambda l, d: d == lang or d == 'und' # NOTE: Why the fuck twint
+#                                                  language detecion is not
+#                                                  working? So I have to write
+#                                                  an extra filter?!!!
 
 def includes(x, y):
 	debug(f'checking whether or not {y} includes {x}')
@@ -81,6 +89,4 @@ def includes(x, y):
 	# if x.lower() in y.lower(): return True
 	# # elif x.lower() in normalize(y, prioritize_alpha=True)[0]: return True
 	# else: return False
-
-wo_mentions = lambda t: " ".join(filter(lambda x: x[0]!='@', t.split()))
 
