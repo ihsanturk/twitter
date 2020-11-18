@@ -7,6 +7,12 @@ Usage:
 
 Options:
   -l <lang>, --lang <lang>  Tweet language [default: tr].
+  --mongo-host <string>     MongoDB host ip [default: localhost].
+  --mongo-port <numeric>    MongoDB port [default: 27017].
+  --mongo-pass <string>     MongoDB password.
+  --mongo-user <string>     MongoDB username.
+  -l <lang>, --lang <lang>  Tweet language [default: tr].
+  -l <lang>, --lang <lang>  Tweet language [default: tr].
   -h --help                 Show this screen.
   --version                 Show the version.
 
@@ -23,21 +29,29 @@ import asyncio.exceptions
 from twitter.util import *
 from pymongo import MongoClient
 from concurrent.futures import ThreadPoolExecutor
-from twitter.mongo_credentials import port, username, password, host
 
 max_thread_workers = 40 # 40:1m10s # 50:1m32s gives ocasianally warnings
-logging.basicConfig(level=logging.ERROR)
-dbclient = MongoClient(f'mongodb://{host}:{port}')
-db = dbclient['twitter']
-
+logging.basicConfig(level=logging.DEBUG) #ERROR)
 suggest = lambda e: sys.stderr.write('suggestion: '+twitter.error.suggestions[e]+'\n')
 
 def main():
 
 	arg = docopt(__doc__, version='0.1.0')
 	queries = readfile(arg['<queryfile>'])
+	dbclient = MongoClient(
+		host = arg["--mongo-host"],
+		port = int(arg["--mongo-port"]),
+		username = arg["--mongo-user"],
+		password = arg["--mongo-pass"]
+	)
+	if not input("""This program will [create and] use "twitter" db in mongodb.
+Are you okay with that? [y/N]: """).startswith('y'):
+		sys.stderr.write('bye then.\n')
+		sys.exit(0)
+	db = dbclient['twitter']
 	while True:
 		try:
+			sys.stderr.write('creating index for db:twitter->coll:tweets->field:tweet\n')
 			db.tweets.create_index([("tweet", pymongo.TEXT)], # respects if exists
 				background=True)
 			break
@@ -56,7 +70,6 @@ def main():
 		with ThreadPoolExecutor(max_workers=max_thread_workers) as executor:
 			executor.map(fetch, config_list)
 			executor.shutdown(wait=True)
-		print('END') #TODO#: dd
 
 def fetch(c):
 	lastpos_date = lastposf(db.info, c.Search).astimezone(tz=timezone.utc)
