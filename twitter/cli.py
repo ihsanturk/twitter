@@ -30,37 +30,14 @@ from twitter.util import *
 from pymongo import MongoClient
 from concurrent.futures import ThreadPoolExecutor
 
+version = '0.1.1'
 max_thread_workers = 40 # 40:1m10s # 50:1m32s gives ocasianally warnings
 logging.basicConfig(level=logging.DEBUG) #ERROR)
-suggest = lambda e: sys.stderr.write('suggestion: '+twitter.error.suggestions[e]+'\n')
+suggest = lambda e: err(f'suggestion: {color.GREEN}{twitter.error.suggestions[e]}{color.END}')
 
 def main():
 
-	arg = docopt(__doc__, version='0.1.0')
-	queries = readfile(arg['<queryfile>'])
-	dbclient = MongoClient(
-		host = arg["--mongo-host"],
-		port = int(arg["--mongo-port"]),
-		username = arg["--mongo-user"],
-		password = arg["--mongo-pass"]
-	)
-	if not input("""This program will [create and] use "twitter" db in mongodb.
-Are you okay with that? [y/N]: """).startswith('y'):
-		sys.stderr.write('bye then.\n')
-		sys.exit(0)
-	db = dbclient['twitter']
-	while True:
-		try:
-			sys.stderr.write('creating index for db:twitter->coll:tweets->field:tweet\n')
-			db.tweets.create_index([("tweet", pymongo.TEXT)], # respects if exists
-				background=True)
-			break
-		except pymongo.errors.ServerSelectionTimeoutError:
-			suggest("mongo_cannot_connect")
-			# notify_error_via_email() #NOTE: Not implemented
-			continue
-
-	# action
+	arg, queries = initialize()
 	while True:
 		config_list = [
 			twint.Config(Search=q, Store_json=True, Store_object=True,
@@ -71,6 +48,35 @@ Are you okay with that? [y/N]: """).startswith('y'):
 			executor.map(fetch, config_list)
 			executor.shutdown(wait=True)
 
+# ---===---===---===---===---===---===---===---===---===---===---===---===--- #
+
+def initialize():
+	global db
+	arg = docopt(__doc__, version=version)
+	queries = readfile(arg['<queryfile>'])
+	dbclient = MongoClient(
+		host = arg["--mongo-host"],
+		port = int(arg["--mongo-port"]),
+		username = arg["--mongo-user"],
+		password = arg["--mongo-pass"]
+	)
+	if not input("""This program will [create and] use "twitter" db in mongodb.
+Are you okay with that? [y/N]: """).startswith('y'):
+		warn('bye then.\n')
+		sys.exit(0)
+	db = dbclient['twitter']
+	while True:
+		try:
+			warn('connecting & creating index for db:twitter->coll:tweets->field:tweet...')
+			db.tweets.create_index([("tweet", pymongo.TEXT)], background=True)
+			break
+		except pymongo.errors.ServerSelectionTimeoutError:
+			err(f'{color.RED}mongo timeout{color.END}')
+			suggest("mongo_cannot_connect")
+			# notify_error_via_email() #NOTE: Not implemented
+			continue
+	return arg, queries
+
 def fetch(c):
 	lastpos_date = lastposf(db.info, c.Search).astimezone(tz=timezone.utc)
 	c.Since = lastpos_date.strftime(dateformat) # string
@@ -79,9 +85,9 @@ def fetch(c):
 	else:
 		try:
 			lt = twint.output.tweets_list[0] # latest tweet
-			sys.stderr.write(f'{c.Search}: {len(twint.output.tweets_list)} new tweet(s) since {c.Since}\n')
+			err(f'{c.Search}: {len(twint.output.tweets_list)} new tweet(s) since {c.Since}')
 		except IndexError:
-			sys.stderr.write(f'no tweets found: {c.Search}\n')
+			err(f'no tweets found: {c.Search}')
 			set_lastpos(db.info, c.Search, now())
 		else: set_lastpos(db.info, c.Search, dateparse(f"{lt.datestamp} {lt.timestamp} {lt.timezone}"))
 	twint.output.clean_lists()
@@ -105,7 +111,7 @@ sys.modules["twint.storage.write"].Json = Json
 
 import signal
 def signal_handler(sig, frame): # clean up code
-	sys.stderr.write('killing...\n')
+	err('killing...')
 	sys.exit(0)
 
 if __name__ == '__main__':
