@@ -32,7 +32,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 version = '0.1.1'
 max_thread_workers = 40 # 40:1m10s # 50:1m32s gives ocasianally warnings
-logging.basicConfig(level=logging.DEBUG) #ERROR)
+logging.basicConfig(level=logging.ERROR)
 suggest = lambda e: err(f'suggestion: {color.GREEN}{twitter.error.suggestions[e]}{color.END}')
 
 def main():
@@ -60,10 +60,6 @@ def initialize():
 		username = arg["--mongo-user"],
 		password = arg["--mongo-pass"]
 	)
-	# if not input("""This program will [create and] use "twitter" db in mongodb.
-# Are you okay with that? [y/N]: """).startswith('y'):
-	# 	warn('bye then.\n')
-	# 	sys.exit(0)
 	db = dbclient['twitter']
 	while True:
 		try:
