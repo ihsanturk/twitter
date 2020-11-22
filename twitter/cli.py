@@ -60,10 +60,10 @@ def initialize():
 		username = arg["--mongo-user"],
 		password = arg["--mongo-pass"]
 	)
-	if not input("""This program will [create and] use "twitter" db in mongodb.
-Are you okay with that? [y/N]: """).startswith('y'):
-		warn('bye then.\n')
-		sys.exit(0)
+	# if not input("""This program will [create and] use "twitter" db in mongodb.
+# Are you okay with that? [y/N]: """).startswith('y'):
+	# 	warn('bye then.\n')
+	# 	sys.exit(0)
 	db = dbclient['twitter']
 	while True:
 		try:
