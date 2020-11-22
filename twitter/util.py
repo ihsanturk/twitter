@@ -7,6 +7,7 @@ from twitter.color import Colors as color
 # from confusables import normalize
 
 debug = logging.debug
+err   = lambda m: sys.stderr.write(str(m)+'\n')
 info  = lambda m: logging.info(f'{color.BLUE}{m}{color.END}')
 warn  = lambda m: logging.warn(f'{color.YELLOW}{m}{color.END}')
 wo_mentions = lambda t: " ".join(filter(lambda x: x[0]!='@', t.split()))
