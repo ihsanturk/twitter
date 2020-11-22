@@ -1,7 +1,7 @@
 { lib, buildPythonPackage, docopt, twint }:
 buildPythonPackage rec {
 	pname = "twitter";
-	version = "0.0.1";
+	version = "1.0.0";
 
 	src = ./.;
 	doCheck = false;

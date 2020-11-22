@@ -1,4 +1,0 @@
-redis
-docopt
-rejson
-https://github.com/ihsanturk/twint

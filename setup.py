@@ -4,7 +4,7 @@ setup(
 
 	author='ihsan',
 	name='twitter',
-	version='0.0.1',
+	version='1.0.0',
 	packages=find_packages(),
 	author_email='ihsanl@pm.me',
 	description='Twitter scraper, streamer',
