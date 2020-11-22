@@ -1,7 +1,7 @@
 """twitter - Twitter scraper, streamer
 
 Usage:
-  twitter stream [options] <queryfile>
+  twitter stream [options] [<queryfile>]
   twitter (-h | --help)
   twitter --version
 
@@ -53,7 +53,7 @@ def main():
 def initialize():
 	global db
 	arg = docopt(__doc__, version=version)
-	queries = readfile(arg['<queryfile>'])
+	queries = readfile(arg['<queryfile>']) if arg['<queryfile>'] else sys.stdin.read().splitlines()
 	dbclient = MongoClient(
 		host = arg["--mongo-host"],
 		port = int(arg["--mongo-port"]),

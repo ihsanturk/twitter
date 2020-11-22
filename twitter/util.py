@@ -21,7 +21,7 @@ def readfile(fl):
 			return f.read().splitlines()
 			f.close()
 	except FileNotFoundError:
-		sys.stderr.write(f'no such file or directory: {arg["<queryfile>"]}\n')
+		sys.stderr.write(f'no such file or directory: {fl}\n')
 		sys.exit(2)
 
 def lastposf(mongocollection, query):
