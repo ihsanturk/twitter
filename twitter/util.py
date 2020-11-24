@@ -63,7 +63,7 @@ def get_lastpos(mongocollection, query):
 
 def mongo_save(db, document, config):
 	debug(f'saving: {document}')
-	if not filters_pass(config.Search, document['tweet'], config.Lang): return
+	if not filters_pass(config.Search, document, config.Lang): return
 	try: db.tweets.insert_one(document)
 	except pymongo.errors.DuplicateKeyError: return
 	else: # not a duplicate
@@ -73,7 +73,7 @@ def mongo_save(db, document, config):
 def filters_pass(q, d, lang):
 	language_is(lang, d['lang']) and includes(q, d['tweet'])
 
-language_is = lambda l, d: d == lang or d == 'und' # NOTE: Why the fuck twint
+language_is = lambda l, d: d == l or d == 'und' # NOTE: Why the fuck twint
 #                                                  language detecion is not
 #                                                  working? So I have to write
 #                                                  an extra filter?!!!
