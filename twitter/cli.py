@@ -52,6 +52,8 @@ def main():
 		with ThreadPoolExecutor(max_workers=max_thread_workers) as executor:
 			executor.map(fetch, config_list)
 			executor.shutdown(wait=True)
+		err(f'cycle {n}')
+		n += 1
 
 # ---===---===---===---===---===---===---===---===---===---===---===---===--- #
 
@@ -76,7 +78,7 @@ def initialize():
 			suggest("mongo_cannot_connect")
 			# notify_error_via_email() #NOTE: Not implemented
 			continue
-	return arg, queries
+	return 0, arg, queries
 
 def fetch(c):
 	lastpos_date = lastposf(db.info, c.Search).astimezone(tz=timezone.utc)
