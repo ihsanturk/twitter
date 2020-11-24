@@ -35,7 +35,14 @@ suggest = lambda e: err(f'suggestion: {color.GREEN}{twitter.error.suggestions[e]
 
 def main():
 
-	arg, queries = initialize()
+	# # test (thread pool executor swallows errors)
+	# n, arg, queries = initialize()
+	# config = twint.Config(Search = queries[350], Store_json = True,
+	# 	Store_object = True, Output = "tweets.json", Hide_output = True,
+	# 	Lang = arg['--lang'])
+	# fetch(config)
+
+	n, arg, queries = initialize()
 	while True:
 		config_list = [
 			twint.Config(Search=q, Store_json=True, Store_object=True,

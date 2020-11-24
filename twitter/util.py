@@ -78,7 +78,7 @@ language_is = lambda l, d: d == l or d == 'und' # NOTE: Why the fuck twint
 #                                                  working? So I have to write
 #                                                  an extra filter?!!!
 
-def includes(x, y):
+def includes(x, y): # TODO: simplify just returning (in, and)
 	debug(f'checking whether or not {y} includes {x}')
 	if x.lower() in wo_mentions(y.lower()):
 		info(f'YES {x}: `{y}`')
