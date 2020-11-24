@@ -11,8 +11,6 @@ Options:
   --mongo-port <numeric>    MongoDB port [default: 27017].
   --mongo-pass <string>     MongoDB password.
   --mongo-user <string>     MongoDB username.
-  -l <lang>, --lang <lang>  Tweet language [default: tr].
-  -l <lang>, --lang <lang>  Tweet language [default: tr].
   -h --help                 Show this screen.
   --version                 Show the version.
 
