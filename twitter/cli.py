@@ -84,7 +84,8 @@ def fetch(c):
 	lastpos_date = lastposf(db.info, c.Search).astimezone(tz=timezone.utc)
 	c.Since = lastpos_date.strftime(dateformat) # string
 	try: twint.run.Search(c)
-	except asyncio.exceptions.TimeoutError as e: error(e); pass
+	except asyncio.exceptions.TimeoutError as e:
+		sys.stderr.write(str(e) + '\n'); pass
 	else:
 		try:
 			lt = twint.output.tweets_list[0] # latest tweet
@@ -94,11 +95,6 @@ def fetch(c):
 			set_lastpos(db.info, c.Search, now())
 		else: set_lastpos(db.info, c.Search, dateparse(f"{lt.datestamp} {lt.timestamp} {lt.timezone}"))
 	twint.output.clean_lists()
-
-# no finished message should be
-class NoMoreTweetsException(Exception):
-	def __init__(self, msg): super().__init__()
-sys.modules["twint.feed"].NoMoreTweetsException = NoMoreTweetsException
 
 # overwrite json method to store tweets in db.
 def Json(obj, config):
