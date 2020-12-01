@@ -30,7 +30,7 @@ from pymongo import MongoClient
 from concurrent.futures import ThreadPoolExecutor
 
 version = '1.0.1'
-max_thread_workers = 40 # 40:1m10s # 50:1m32s gives ocasianally warnings
+max_thread_workers = 30 # 40:1m10s # 50:1m32s gives ocasianally warnings
 logging.basicConfig(level=logging.ERROR)
 suggest = lambda e: err(f'suggestion: {color.GREEN}{twitter.error.suggestions[e]}{color.END}')
 
