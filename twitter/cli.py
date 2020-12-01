@@ -83,7 +83,7 @@ def fetch(c):
 	else:
 		try:
 			lt = twint.output.tweets_list[0] # latest tweet
-			err(f'{c.Search}: {len(twint.output.tweets_list)} new tweet(s) since {c.Since}')
+			err(f'{c.Search}: {len(twint.output.tweets_list) - 1} new tweet(s) since {c.Since}')
 		except IndexError:
 			err(f'no tweets found: {c.Search}')
 			set_lastpos(db.info, c.Search, now())
