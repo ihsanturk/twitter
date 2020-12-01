@@ -1,4 +1,8 @@
-*credential*
-__pycache__
 *run*
+*dist/*
+*build/*
+*egg-info*
+__pycache__
+*credential*
 *sync-conflict*
+requirements.txt
