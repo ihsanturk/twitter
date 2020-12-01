@@ -72,7 +72,7 @@ def mongo_save(db, document, config):
 		db.tweets.insert_one(document)
 	except pymongo.errors.DuplicateKeyError:
 		return
-	else: # not a duplicate
-		print(f'{document["capture_delay_sec"]:4.4f}',
-			config.Search, document["tweet"], sep='\t')
+	# else: # not a duplicate
+	# 	print(f'{document["capture_delay_sec"]:4.4f}',
+	# 		config.Search, document["tweet"], sep='\t')
 
