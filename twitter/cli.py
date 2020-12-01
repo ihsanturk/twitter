@@ -25,10 +25,11 @@ import twitter.error
 from docopt import docopt
 import asyncio.exceptions
 from twitter.util import *
+import twitter.proxy as proxy
 from pymongo import MongoClient
 from concurrent.futures import ThreadPoolExecutor
 
-version = '1.0.0'
+version = '1.0.1'
 max_thread_workers = 40 # 40:1m10s # 50:1m32s gives ocasianally warnings
 logging.basicConfig(level=logging.ERROR)
 suggest = lambda e: err(f'suggestion: {color.GREEN}{twitter.error.suggestions[e]}{color.END}')
@@ -52,8 +53,8 @@ def main():
 		with ThreadPoolExecutor(max_workers=max_thread_workers) as executor:
 			executor.map(fetch, config_list)
 			executor.shutdown(wait=True)
-		err(f'cycle {n}')
-		n += 1
+		err(f'cycle {cycle}')
+		cycle += 1
 
 # ---===---===---===---===---===---===---===---===---===---===---===---===--- #
 
