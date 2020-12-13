@@ -35,8 +35,15 @@ logging.basicConfig(level=logging.ERROR)
 suggest = lambda e: err(f'suggestion: {color.GREEN}{twitter.error.suggestions[e]}{color.END}')
 
 def main():
-
 	n, arg, queries = initialize()
+
+	# while True:
+	# 	for query in queries:
+	# 		fetch(
+	# 			twint.Config(Search=q, Store_json=True, Store_object=True,
+	# 			Output="tweets.json", Hide_output = True, Lang = arg['--lang'])
+	# 		)
+
 	while True:
 		config_list = [
 			twint.Config(Search=q, Store_json=True, Store_object=True,
@@ -79,7 +86,7 @@ def fetch(c):
 	c.Since = lastpos_date.strftime(dateformat) # string
 	try: twint.run.Search(c)
 	except asyncio.exceptions.TimeoutError as e:
-		sys.stderr.write(str(e) + '\n'); pass
+		err(str(e) + '\n'); pass
 	else:
 		try:
 			lt = twint.output.tweets_list[0] # latest tweet
