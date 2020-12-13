@@ -16,7 +16,10 @@ twitter --help
 ```
 
 ## Notes for Developer
-Some of the meanings in the source code;
+### TODO
+- [ ] ThreadPool executor makes dissapear the errors. Try `asyncio`.
+
+### Some of the meanings in the source code
 - `#TODO#<number>`: A thing to do with enumarated priority. For example #TODO#0 means first problem to solve (do). #TODO#1 is a problem that needs to be solved after #TODO#0 solved.
 - `#TODO#p`: A thing to do when going production.
 - `#TODO#e`: A thing to do at the end of the project. After solving everything before.

@@ -1,13 +1,14 @@
-{ lib, buildPythonPackage, docopt, twint }:
+{ lib, buildPythonPackage, docopt, twint, pymongo }:
 buildPythonPackage rec {
 	pname = "twitter";
-	version = "1.0.0";
+	version = "1.0.1";
 
 	src = ./.;
 	doCheck = false;
 	propagatedBuildInputs = [
-		docopt
 		twint
+		docopt
+		pymongo
 	];
 
 	meta = with lib; {
