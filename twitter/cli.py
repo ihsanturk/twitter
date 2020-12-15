@@ -28,34 +28,21 @@ from datetime import timezone
 # import twitter.proxy as proxy
 from twitter.color import Colors as color
 from pymongo import MongoClient, TEXT, errors
-from concurrent.futures import ThreadPoolExecutor
+import nest_asyncio
+nest_asyncio.apply()
 
-version = '1.0.1'
-max_thread_workers = 30  # 40:1m10s # 50:1m32s gives ocasianally warnings
+version = '1.1.0'
 logging.basicConfig(level=logging.ERROR)
 
 
-def main():
-	n, arg, queries = initialize()
-
-	# while True:
-	# 	for query in queries:
-	# 		fetch(
-	# 			twint.Config(Search=q, Store_json=True, Store_object=True,
-	# 			Output="tweets.json", Hide_output = True, Lang = arg['--lang'])
-	# 		)
-
+async def async_main():
+	arg, queries = initialize()
 	while True:
-		config_list = [twint.Config(Search=q, Store_json=True,
+		tasks = [fetch(twint.Config(Search=q, Store_json=True,
 			              Store_object=True, Output="tweets.json",
-			              Hide_output=True, Lang=arg['--lang'])
-			              for q in queries]
-		with ThreadPoolExecutor(max_workers=max_thread_workers) as executor:
-			executor.map(fetch, config_list)
-			executor.shutdown(wait=True)
-
-
-# -------------------------------------------------------------------------- #
+			              Hide_output=True, Lang=arg['--lang']))
+			        for q in queries]
+		await asyncio.gather(*tasks)  # , return_exceptions=True)
 
 
 def initialize():
@@ -81,10 +68,10 @@ def initialize():
 			suggest("mongo_cannot_connect")
 			# notify_error_via_email() #NOTE: Not implemented
 			continue
-	return 0, arg, queries
+	return arg, queries
 
 
-def fetch(c):
+async def fetch(c):
 	lastpos_date = util.lastposf(db.info, c.Search).astimezone(tz=timezone.utc)
 	c.Since = lastpos_date.strftime(util.dateformat)  # string
 	try:
@@ -117,7 +104,6 @@ def Json(obj, config):  # overwrite json method to store tweets in db.
 	t['capture_delay_sec'] = delta.total_seconds()
 	util.mongo_save(db, t, config)
 
-
 sys.modules["twint.storage.write"].Json = Json
 
 
@@ -131,6 +117,10 @@ def suggest(e):
 			       f'{color.GREEN}{twitter.error.suggestions[e]}{color.END}')
 
 
-if __name__ == '__main__':
+def main():
 	signal.signal(signal.SIGINT, signal_handler)
+	asyncio.run(async_main())
+
+
+if __name__ == '__main__':
 	main()

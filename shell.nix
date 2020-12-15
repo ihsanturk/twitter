@@ -16,6 +16,7 @@ let
 		inherit twint lib;
 		docopt = pkgs.python37Packages.docopt;
 		pymongo = pkgs.python37Packages.pymongo;
+		nest-asyncio = python38Packages.nest-asyncio;
 		buildPythonPackage = pkgs.python37Packages.buildPythonPackage;
 	};
 	# confusables = mach-nix.buildPythonPackage {
