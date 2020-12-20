@@ -39,9 +39,9 @@ async def async_main():
 	arg, queries = initialize()
 	while True:
 		tasks = [fetch(twint.Config(Search=q, Store_json=True,
-			              Store_object=True, Output="tweets.json",
-			              Hide_output=True, Lang=arg['--lang']))
-			        for q in queries]
+		                            Store_object=True, Output="tweets.json",
+		                            Hide_output=True, Lang=arg['--lang']))
+		         for q in queries]
 		await asyncio.gather(*tasks)  # , return_exceptions=True)
 
 
@@ -60,7 +60,7 @@ def initialize():
 	while True:
 		try:
 			util.warn('connecting & creating index for '
-				         'db:twitter->coll:tweets->field:tweet...')
+			          'db:twitter->coll:tweets->field:tweet...')
 			db.tweets.create_index([("tweet", TEXT)], background=True)
 			break
 		except errors.ServerSelectionTimeoutError:
@@ -83,14 +83,14 @@ async def fetch(c):
 		try:
 			lt = twint.output.tweets_list[0]  # latest tweet
 			util.err(f'{c.Search}: {len(twint.output.tweets_list) - 1} '
-					       'new tweet(s) since {c.Since}')
+			         f'new tweet(s) since {c.Since}')
 		except IndexError:
 			util.err(f'no tweets found: {c.Search}')
 			util.set_lastpos(db.info, c.Search, util.now())
 		else:
 			util.set_lastpos(db.info, c.Search,
-					               util.dateparse(f'{lt.datestamp} {lt.timestamp} '
-					                              '{lt.timezone}'))
+			                 util.dateparse(f'{lt.datestamp} {lt.timestamp} '
+			                                f'{lt.timezone}'))
 	twint.output.clean_lists()
 
 
@@ -104,6 +104,7 @@ def Json(obj, config):  # overwrite json method to store tweets in db.
 	t['capture_delay_sec'] = delta.total_seconds()
 	util.mongo_save(db, t, config)
 
+
 sys.modules["twint.storage.write"].Json = Json
 
 
@@ -114,7 +115,7 @@ def signal_handler(sig, frame):  # clean up code
 
 def suggest(e):
 	util.err('suggestion: '
-			       f'{color.GREEN}{twitter.error.suggestions[e]}{color.END}')
+	         f'{color.GREEN}{twitter.error.suggestions[e]}{color.END}')
 
 
 def main():
