@@ -17,6 +17,7 @@ Options:
 """
 
 import sys
+import time
 import twint
 import signal
 import logging
@@ -36,12 +37,13 @@ logging.basicConfig(level=logging.ERROR)
 
 
 async def async_main(queries, lang):
+	limit = 92  # FIXME: make this auto (now: specific to the hardware)
 	while True:
 		tasks = [fetch(twint.Config(Search=q, Store_json=True,
 		                            Store_object=True, Output="tweets.json",
 		                            Hide_output=True, Lang=lang))
 		         for q in queries]
-		await asyncio.gather(*tasks)  # , return_exceptions=True)
+		await util.gather_with_concurrency(limit, *tasks)
 
 
 def initialize():
@@ -80,6 +82,8 @@ async def fetch(c):
 	except (asyncio.exceptions.TimeoutError,
 	        twint.token.RefreshTokenException) as e:
 		util.err(str(e))
+		print('waiting for 5 secs')  # TODO: delete
+		time.sleep(10)  # TODO: delete
 		pass
 	else:
 		try:

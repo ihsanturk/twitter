@@ -17,7 +17,7 @@ twitter --help
 
 ## Notes for Developer
 ### TODO
-- [ ] ThreadPool executor makes dissapear the errors. Try `asyncio`.
+- [X] ThreadPool executor makes dissapear the errors. Try `asyncio`.
 
 ### Some of the meanings in the source code
 - `#TODO#<number>`: A thing to do with enumarated priority. For example #TODO#0 means first problem to solve (do). #TODO#1 is a problem that needs to be solved after #TODO#0 solved.

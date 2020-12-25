@@ -1,4 +1,5 @@
 import sys
+import asyncio
 import logging
 import pymongo
 import twitter.error
@@ -8,6 +9,19 @@ from twitter.color import Colors as color
 
 debug = logging.debug
 dateformat = '%Y-%m-%d %H:%M:%S'
+
+
+async def gather_with_concurrency(n, *tasks):
+	semaphore = asyncio.Semaphore(n)
+
+	async def sem_task(task):
+		async with semaphore:
+			return await task
+
+	return await asyncio.gather(
+	    *(sem_task(task) for task in tasks),
+	    # , return_exceptions=True)
+	)
 
 
 def now():
