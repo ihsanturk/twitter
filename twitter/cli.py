@@ -31,7 +31,7 @@ from pymongo import MongoClient, TEXT, errors
 import nest_asyncio
 nest_asyncio.apply()
 
-version = '1.2.0'
+version = '1.2.1'
 logging.basicConfig(level=logging.ERROR)
 
 

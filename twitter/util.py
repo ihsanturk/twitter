@@ -11,23 +11,23 @@ dateformat = '%Y-%m-%d %H:%M:%S'
 
 
 def now():
-	datetime.now(timezone.utc)
+	return datetime.now(timezone.utc)
 
 
 def language_is(lang, d):
-	(d == lang or d == 'und')
+	return (d == lang or d == 'und')
 
 
 def err(m):
-	sys.stderr.write(str(m) + '\n')
+	return sys.stderr.write(str(m) + '\n')
 
 
 def init_lastpos(mc, q):
-	set_lastpos(mc, q, now())
+	return set_lastpos(mc, q, now())
 
 
 def includes(x, y):
-	x.lower() in wo_mentions(y.lower())
+	return x.lower() in wo_mentions(y.lower())
 
 
 def info(m):
@@ -35,7 +35,7 @@ def info(m):
 
 
 def dateparse(d):
-	datetime.strptime(d, '%Y-%m-%d %H:%M:%S %z')
+	return datetime.strptime(d, '%Y-%m-%d %H:%M:%S %z')
 
 
 def warn(m):
@@ -43,11 +43,11 @@ def warn(m):
 
 
 def wo_mentions(t):
-	" ".join(filter(lambda x: x[0] != '@', t.split()))
+	return " ".join(filter(lambda x: x[0] != '@', t.split()))
 
 
 def filters_pass(q, d, lang):
-	language_is(lang, d['lang']) and includes(q, d['tweet'])
+	return language_is(lang, d['lang']) and includes(q, d['tweet'])
 
 
 def readfile(fl):
@@ -90,7 +90,7 @@ def get_lastpos(mc, query):
 	debug(f'getting last pos value for {query}')
 	try:
 		result = mc.find_one({"_id": query}, {'lastpos': 1, '_id': 0})
-		if not result:
+		if not result or not result['lastpos']:
 			raise twitter.error.NoLastPositionData(query)
 	except pymongo.errors.ServerSelectionTimeoutError:
 		logging.critical('could not connected to mongodb')
