@@ -47,14 +47,14 @@ async def async_main(queries, lang):
 def initialize():
 	global db
 	arg = docopt(__doc__, version=version)
-	if arg['<queryfile>']:
+	if (arg['<queryfile>']) and (not arg['<queryfile>'] == '-'):
 		queries = util.readfile(arg['<queryfile>'])
 	else:
-		sys.stdin.read().splitlines()
+		queries = sys.stdin.read().splitlines()
 	dbclient = MongoClient(host=arg["--mongo-host"],
-		                      port=int(arg["--mongo-port"]),
-		                      username=arg["--mongo-user"],
-		                      password=arg["--mongo-pass"])
+	                       port=int(arg["--mongo-port"]),
+	                       username=arg["--mongo-user"],
+	                       password=arg["--mongo-pass"])
 	db = dbclient['twitter']
 	while True:
 		try:
@@ -76,7 +76,7 @@ async def fetch(c):
 	try:
 		twint.run.Search(c)
 	except asyncio.exceptions.TimeoutError as e:
-		util.err(str(e) + '\n')
+		util.err(str(e))
 		pass
 	else:
 		try:
