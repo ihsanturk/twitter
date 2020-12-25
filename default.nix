@@ -1,7 +1,7 @@
 { lib, buildPythonPackage, docopt, twint, pymongo, nest-asyncio }:
 buildPythonPackage rec {
 	pname = "twitter";
-	version = "1.2.1";
+	version = "1.2.2";
 
 	src = ./.;
 	doCheck = false;

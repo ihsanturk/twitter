@@ -31,7 +31,7 @@ from pymongo import MongoClient, TEXT, errors
 import nest_asyncio
 nest_asyncio.apply()
 
-version = '1.2.1'
+version = '1.2.2'
 logging.basicConfig(level=logging.ERROR)
 
 
@@ -57,16 +57,18 @@ def initialize():
 	                       password=arg["--mongo-pass"])
 	db = dbclient['twitter']
 	while True:
+		util.warn('connecting & creating index for '
+		          'db:twitter->coll:tweets->field:tweet...')
 		try:
-			util.warn('connecting & creating index for '
-			          'db:twitter->coll:tweets->field:tweet...')
 			db.tweets.create_index([("tweet", TEXT)], background=True)
-			break
 		except errors.ServerSelectionTimeoutError:
 			util.err(f'{color.RED}mongo timeout{color.END}')
 			suggest("mongo_cannot_connect")
 			# notify_error_via_email() #NOTE: Not implemented
 			continue
+		else:
+			break
+
 	return arg, queries
 
 
@@ -75,18 +77,19 @@ async def fetch(c):
 	c.Since = lastpos_date.strftime(util.dateformat)  # string
 	try:
 		twint.run.Search(c)
-	except asyncio.exceptions.TimeoutError as e:
+	except (asyncio.exceptions.TimeoutError,
+	        twint.token.RefreshTokenException) as e:
 		util.err(str(e))
 		pass
 	else:
 		try:
 			lt = twint.output.tweets_list[0]  # latest tweet
-			util.err(f'{c.Search}: {len(twint.output.tweets_list) - 1} '
-			         f'new tweet(s) since {c.Since}')
 		except IndexError:
 			util.err(f'no tweets found: {c.Search}')
 			util.set_lastpos(db.info, c.Search, util.now())
 		else:
+			util.err(f'{c.Search}: {len(twint.output.tweets_list) - 1} '
+			         f'new tweet(s) since {c.Since}')
 			util.set_lastpos(db.info, c.Search,
 			                 util.dateparse(f'{lt.datestamp} {lt.timestamp} '
 			                                f'{lt.timezone}'))
