@@ -31,16 +31,15 @@ from pymongo import MongoClient, TEXT, errors
 import nest_asyncio
 nest_asyncio.apply()
 
-version = '1.1.0'
+version = '1.2.0'
 logging.basicConfig(level=logging.ERROR)
 
 
-async def async_main():
-	arg, queries = initialize()
+async def async_main(queries, lang):
 	while True:
 		tasks = [fetch(twint.Config(Search=q, Store_json=True,
 		                            Store_object=True, Output="tweets.json",
-		                            Hide_output=True, Lang=arg['--lang']))
+		                            Hide_output=True, Lang=lang))
 		         for q in queries]
 		await asyncio.gather(*tasks)  # , return_exceptions=True)
 
@@ -120,7 +119,8 @@ def suggest(e):
 
 def main():
 	signal.signal(signal.SIGINT, signal_handler)
-	asyncio.run(async_main())
+	arg, queries = initialize()
+	asyncio.run(async_main(queries, arg['--lang']))
 
 
 if __name__ == '__main__':
