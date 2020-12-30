@@ -17,7 +17,7 @@ Options:
 """
 
 import sys
-import time
+# import time
 import twint
 import signal
 import logging
@@ -26,23 +26,36 @@ from docopt import docopt
 import asyncio.exceptions
 import twitter.util as util
 from datetime import timezone
-# import twitter.proxy as proxy
+import twitter.proxy as proxy
 from twitter.color import Colors as color
 from pymongo import MongoClient, TEXT, errors
 import nest_asyncio
 nest_asyncio.apply()
 
-version = '1.2.2'
+version = '1.2.3'
 logging.basicConfig(level=logging.ERROR)
 
 
 async def async_main(queries, lang):
-	limit = 92  # FIXME: make this auto (now: specific to the hardware)
+	# issue: ~/Sync/issue/max-recursion.txt
+	limit = 90  # NOTE: make this auto (now: specific to the hardware)
+	proxies = proxy.refresh()
+	util.info(f'got {len(proxies)} proxies from proxyscrape')
+	c = 0
 	while True:
-		tasks = [fetch(twint.Config(Search=q, Store_json=True,
-		                            Store_object=True, Output="tweets.json",
-		                            Hide_output=True, Lang=lang))
-		         for q in queries]
+		tasks = []
+		for q in queries:
+			ph, pp = proxy.get_one(proxies, (c % len(proxies)))
+			util.info(f'using proxy: {ph}:{pp}')
+			tasks.append(fetch(twint.Config(
+			    Search=q, Store_json=True,
+			    Store_object=True,
+			    Output="tweets.json",
+			    Hide_output=True, Lang=lang,
+			    Proxy_host=ph, Proxy_port=pp,
+			    Proxy_type=proxy.type_
+			)))
+			c += 1
 		await util.gather_with_concurrency(limit, *tasks)
 
 
@@ -78,12 +91,13 @@ async def fetch(c):
 	lastpos_date = util.lastposf(db.info, c.Search).astimezone(tz=timezone.utc)
 	c.Since = lastpos_date.strftime(util.dateformat)  # string
 	try:
+		print(f'fetching tweets including {c.Search}')
 		twint.run.Search(c)
 	except (asyncio.exceptions.TimeoutError,
 	        twint.token.RefreshTokenException) as e:
 		util.err(str(e))
-		print('waiting for 5 secs')  # TODO: delete
-		time.sleep(10)  # TODO: delete
+		# print('waiting for 5 secs')  # TODO: delete
+		# time.sleep(5)  # TODO: delete
 		pass
 	else:
 		try:
