@@ -1,9 +1,0 @@
-*run*
-*dist/*
-*build/*
-.DS_Store
-*egg-info*
-__pycache__
-*credential*
-*sync-conflict*
-requirements.txt
