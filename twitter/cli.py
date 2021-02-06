@@ -38,10 +38,16 @@ logging.basicConfig(level=logging.ERROR)
 
 async def async_main(queries, lang):
 	# issue: ~/Sync/issue/max-recursion.txt
-	limit = 90  # NOTE: make this auto (now: specific to the hardware)
+	limit = 90  # TODO: make this auto (now: specific to the hardware)
 	proxies = proxy.refresh()
 	util.info(f'got {len(proxies)} proxies from proxyscrape')
 	c = 0
+	lastpos_dict = {
+	    q: util.lastposf(db.info, q).astimezone(tz=timezone.utc)
+	    for q in queries
+	}
+	print(lastpos_dict)  # TODO: dd
+	sys.exit(0)  # TODO: dd
 	while True:
 		tasks = []
 		for q in queries:
@@ -96,8 +102,8 @@ async def fetch(c):
 	except (asyncio.exceptions.TimeoutError,
 	        twint.token.RefreshTokenException) as e:
 		util.err(str(e))
-		# print('waiting for 5 secs')  # TODO: delete
-		# time.sleep(5)  # TODO: delete
+		# print('waiting for 5 secs')  # TODO: dd
+		# time.sleep(5)  # TODO: dd
 		pass
 	else:
 		try:
