@@ -5,31 +5,27 @@
 	inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 	inputs.flake-utils.url = "github:numtide/flake-utils";
 
-	outputs = { self, nixpkgs, flake-utils, ... }:
-	flake-utils.lib.eachDefaultSystem (system:
-	let
+	outputs = { self, nixpkgs, flake-utils, }:
+	flake-utils.lib.eachDefaultSystem (system: let
 		pkgs = nixpkgs.legacyPackages.${system};
 	in rec {
 
-		twitter = pkgs.python3Packages.callPackage
-			({ lib, buildPythonPackage, docopt }:
-			buildPythonPackage rec {
+		twitter = { lib, buildPythonApplication, docopt }:
+			buildPythonApplication rec {
 				pname = "twitter";
-				version = "2.0.0-alpha";
+				version = "2.0.1-alpha";
 				src = lib.cleanSource ./.;
 				doCheck = false;
 				propagatedBuildInputs = [
 					docopt
 				];
-			}) {
-			inherit (pkgs) lib buildPythonPackage docopt;
-		};
+			};
 
-		defaultPackage.${system} = twitter;
+		defaultPackage = pkgs.python3Packages.callPackage twitter {};
 
 		defaultApp = {
 			type = "app";
-			program = "${defaultPackage}/bin/twitter";
+			program = "${self.defaultPackage.${system}}/bin/twitter";
 		};
 
 	});

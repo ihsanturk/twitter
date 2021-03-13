@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='twitter',
-    version="0.2.0",
+    version="2.0.1-alpha",
     py_modules=['twitter'],
     entry_points={
         'console_scripts': [
