@@ -1,7 +1,7 @@
-import aiohttp
-import re
+# import aiohttp
+# import re
 
-import get from request # TODO: delete
+from requests import get # TODO: delete
 
 # baseurl = 'https://mobile.twitter.com'
 url_activate = 'https://api.twitter.com/1.1/guest/activate.json'
@@ -20,3 +20,7 @@ def getguesttoken():
 def search(phrase):
     getguesttoken()
     return get() # FIXME: find the url to get after guest token
+
+
+def stream():
+    print('getting user tweets')
