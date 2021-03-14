@@ -9,15 +9,16 @@ Usage:
 Options:
   -g --guest-token          Get a guest token from Twitter.
   -h --help                 Show this screen.
-  -u <username>             Get user latest tweets.
+  -u --user <username>      Get user latest tweets.
   --version                 Show the version.
 
 """
 
 from docopt import docopt
-import sys
+from pprint import pprint
 from twitter.stream import stream
 from twitter.util import getguesttoken
+import sys
 
 version = '2.0.1-alpha'
 
@@ -25,14 +26,15 @@ version = '2.0.1-alpha'
 def main():
     arg = docopt(__doc__, version=version)
 
-    print(arg)  # TODO: delete
+    pprint(arg)  # TODO: delete
 
     if arg['--guest-token']:
-        print(getguesttoken())
-    if arg['stream'] is True and arg['-u'] is not None:
-        stream(user=arg['-u'])
+        pprint(getguesttoken())
     else:
-        print('no user specified, please see help using -h', file=sys.stderr)
+        if arg['stream'] is True and arg['--user'] is not None:
+            stream(user=arg['--user'])
+        else:
+            print('no user specified, please see help using -h', file=sys.stderr)
 
 
 if __name__ == '__main__':
