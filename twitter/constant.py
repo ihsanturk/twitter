@@ -1,8 +1,13 @@
 bearer_token = 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA'
 useragent    = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101 Firefox/78.0'
 
-url_activate    = 'https://api.twitter.com/1.1/guest/activate.json'
-url_base        = 'https://twitter.com'
-url_mobile      = 'https://mobile.twitter.com'
-url_user_screen = 'https://api.twitter.com/1.1/users/show.json?screen_name='
-
+url_activate                = 'https://api.twitter.com/1.1/guest/activate.json'
+url_base                    = 'https://twitter.com'
+url_conversation_by_tweetid = 'https://twitter.com/i/api/2/timeline/conversation/<tweetid>.json'
+url_guide                   = 'https://twitter.com/i/api/2/guide.json'
+url_mobile                  = 'https://mobile.twitter.com'
+url_profile_by_userid       = 'https://twitter.com/i/api/2/timeline/profile/[userid].json'
+url_search_adaptive         = 'https://twitter.com/i/api/2/search/adaptive.json'
+url_search_typeahead        = 'https://twitter.com/i/api/1.1/search/typeahead.json'
+url_user_by_screen_name     = 'https://twitter.com/i/api/graphql/jMaTS-_Ea8vh9rpKggJbCQ/UserByScreenName'
+url_user_screen             = 'https://api.twitter.com/1.1/users/show.json?screen_name='
