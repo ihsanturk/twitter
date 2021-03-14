@@ -27,8 +27,6 @@ version = '2.0.1-alpha'
 def main():
     arg = docopt(__doc__, version=version)
 
-    print(arg)  # TODO: delete
-
     if arg['--guest-token']:
         print(get_guest_token())
 
