@@ -1,6 +1,6 @@
 from __future__ import print_function
 from requests import get # TODO: delete
-from util import getguesttoken
+from twitter.util import getguesttoken
 import sys
 
 # baseurl = 'https://mobile.twitter.com'

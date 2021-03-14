@@ -1,12 +1,12 @@
 """twitter - Twitter scraper, streamer
 
 Usage:
-  twitter stream [options] -u <username>
+  twitter stream [options] [ -u <username> ]
   twitter (-h | --help)
   twitter --version
 
 Options:
-  -g                        Get a guest token.
+  -g                        Get a guest token from Twitter.
   -h --help                 Show this screen.
   -u <username>             Get user latest tweets.
   --version                 Show the version.
