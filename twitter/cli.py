@@ -2,6 +2,7 @@
 
 Usage:
   twitter stream [options] [ -u <username> ]
+  twitter (-u <username> | --username <username>)
   twitter (-g | --guest-token)
   twitter (-h | --help)
   twitter --version
@@ -16,7 +17,7 @@ Options:
 
 from docopt import docopt
 from twitter.stream import stream
-from twitter.util import getguesttoken
+from twitter.util import get_guest_token
 import sys
 
 version = '2.0.1-alpha'
@@ -28,7 +29,7 @@ def main():
     print(arg)  # TODO: delete
 
     if arg['--guest-token']:
-        print(getguesttoken())
+        print(get_guest_token())
     else:
         if arg['stream'] is True and arg['--user'] is not None:
             stream(user=arg['--user'])
