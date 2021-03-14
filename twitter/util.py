@@ -1,4 +1,4 @@
-from constant import url_base, bearer_token, useragent
+from twitter.constant import url_base, bearer_token, useragent
 from requests import get
 import re
 

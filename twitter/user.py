@@ -1,6 +1,6 @@
 from requests import get
-from util import get_guest_token
-from constant import bearer_token, url_user_screen
+from twitter.util import get_guest_token
+from twitter.constant import bearer_token, url_user_screen
 
 headers = { 'authorization': bearer_token, 'x-guest-token': get_guest_token() }
 
