@@ -14,7 +14,7 @@ Options:
 
 from docopt import docopt
 import sys
-from twitter import stream
+from twitter.stream import stream
 
 version = '2.0.1-alpha'
 
@@ -22,7 +22,7 @@ version = '2.0.1-alpha'
 def main():
     arg = docopt(__doc__, version=version)
     print(arg)
-    if arg['stream'] and arg['-u'] != None:
+    if arg['stream'] is True and arg['-u'] is not None:
         stream()
     else:
         print('no user specified, please see help using -h', file=sys.stderr)
