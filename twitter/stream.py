@@ -1,20 +1,13 @@
-# import aiohttp
-# import re
-
+from __future__ import print_function
 from requests import get # TODO: delete
+from util import getguesttoken
+import sys
 
 # baseurl = 'https://mobile.twitter.com'
-url_activate = 'https://api.twitter.com/1.1/guest/activate.json'
 useragent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101 Firefox/78.0'
-bearer_token = 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA'
 
 # re.sub(r'gt=\d\+',)
 # re.sub('[0-9]\+')
-
-
-def getguesttoken():
-    return get(url_activate, headers={'authorization': bearer_token}).json()
-    # return aiohttp.get()
 
 
 def search(phrase):
@@ -22,5 +15,8 @@ def search(phrase):
     return get() # FIXME: find the url to get after guest token
 
 
-def stream():
-    print('getting user tweets')
+def stream(user=None):
+    if user is not None:
+        print('getting tweets:', user)
+    else:
+        print("no user specified", file=sys.stderr)
