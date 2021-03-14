@@ -2,11 +2,12 @@
 
 Usage:
   twitter stream [options] [ -u <username> ]
+  twitter (-g | --guest-token)
   twitter (-h | --help)
   twitter --version
 
 Options:
-  -g                        Get a guest token from Twitter.
+  -g --guest-token          Get a guest token from Twitter.
   -h --help                 Show this screen.
   -u <username>             Get user latest tweets.
   --version                 Show the version.
@@ -26,7 +27,7 @@ def main():
 
     print(arg)  # TODO: delete
 
-    if arg['-g']:
+    if arg['--guest-token']:
         print(getguesttoken())
     if arg['stream'] is True and arg['-u'] is not None:
         stream(user=arg['-u'])
