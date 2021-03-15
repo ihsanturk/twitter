@@ -37,7 +37,8 @@ def main():
 
     elif arg['stream']:
         if arg['--user'] is not None:
-            twitter.user.stream(user=arg['--user'])
+            for tweet in twitter.user.stream(user=arg['--user']):
+                print(tweet)
         else:
             print('no user specified, please see --help', file=sys.stderr)
 
