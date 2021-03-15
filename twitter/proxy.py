@@ -6,8 +6,15 @@ url = 'https://api.proxyscrape.com/v2/?request=getproxies&protocol=http'
 
 
 def refresh():
-	return get(url).text.splitlines()
+    """
+    >>> proxies = refresh()
+    """
+    return get(url).text.splitlines()
 
 
 def get_one(proxies, i):
-	return (proxies[i].split(':')[0], proxies[i].split(':')[1])
+    """
+    >>> proxies = refresh()
+    >>> ip, port = proxy.get_one(proxies, 15)
+    """
+    return (proxies[i].split(':')[0], proxies[i].split(':')[1])
