@@ -1,9 +1,9 @@
-from twitter.constant import url_base, bearer_token, useragent
+from twitter.constant import url_base, bearer_token, user_agent
 from requests import get
 import re
 
 def get_guest_token():
-    response = get(url_base, headers={'User-Agent': useragent})
+    response = get(url_base, headers={'User-Agent': user_agent})
     if response.ok:
         match = re.search(r'\("gt=(\d+);', response.text)
         if match:
