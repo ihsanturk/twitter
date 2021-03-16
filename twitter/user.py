@@ -30,7 +30,6 @@ def profile(user=None):
     Returns user profile as JSON, with last statuses (tweets) that includes
     both Tweet & Replies.
     """
-    global headers
     if user is not None:
 
         response = http.get(url_user_screen + user, headers=headers)
@@ -48,18 +47,20 @@ def profile(user=None):
 
 
 def stream(user=None):
+    global headers
     last_reported_tweet = {}
-    counter = 1
+    counter = 1  # NOTE: stuck after 180
     while True:
 
         print(counter, end='\t', file=sys.stderr)
         counter += 1
 
+        headers['User-Agent'] = ua.random
         profile_screen = profile(user=user)
         if 'status' in profile_screen:  # if last tweet exists in JSON
             new_tweet = profile_screen['status']
         else:
-            print('no status object in profile JSON', file=sys.stderr)
+            print('no last tweet object in profile JSON', file=sys.stderr)
             continue
 
         created_at  = datetime.strptime(new_tweet['created_at'], time_format)
