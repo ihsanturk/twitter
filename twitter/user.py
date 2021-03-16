@@ -1,11 +1,25 @@
 from datetime import datetime, timezone
-from requests import get
-from twitter.constant import bearer_token, url_user_screen, user_agent
+from fake_useragent import UserAgent
+import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
+from twitter.constant import bearer_token, url_user_screen, user_agent, time_format
 from twitter.util import get_guest_token
 import sys
 
+retry_strategy = Retry(
+    total=1000,
+    status_forcelist=[429, 500, 502, 503, 504],
+    method_whitelist=["HEAD", "GET", "OPTIONS"]
+)
+adapter = HTTPAdapter(max_retries=retry_strategy)
+http = requests.Session()
+http.mount("https://", adapter)
+http.mount("http://", adapter)
+
+ua = UserAgent()
 headers = {
-    'User-Agent': user_agent,
+    'User-Agent': ua.random,
     'authorization': bearer_token,
     'x-guest-token': get_guest_token()
 }
@@ -13,32 +27,44 @@ headers = {
 
 def profile(user=None):
     """
-    Returns User profile as JSON, with last status (tweet) that includes both
-    Tweet & Replies.
+    Returns user profile as JSON, with last statuses (tweets) that includes
+    both Tweet & Replies.
     """
+    global headers
     if user is not None:
-        response = get(url_user_screen + user, headers=headers)
+
+        response = http.get(url_user_screen + user, headers=headers)
+
         if response.ok:
-            return response.json()
+            now = datetime.strftime(datetime.now(timezone.utc), time_format)
+            response_json = response.json()
+            response_json['captured_at'] = now
+            return response_json
         else:
             response.raise_for_status()
+
     else:
         raise(Exception('no user specified for function: profile()'))
 
 
 def stream(user=None):
     last_reported_tweet = {}
-    time_format = '%a %b %d %H:%M:%S %z %Y'
+    counter = 1
     while True:
 
+        print(counter, end='\t', file=sys.stderr)
+        counter += 1
+
         profile_screen = profile(user=user)
-        if 'status' in profile_screen:
+        if 'status' in profile_screen:  # if last tweet exists in JSON
             new_tweet = profile_screen['status']
         else:
+            print('no status object in profile JSON', file=sys.stderr)
             continue
 
-        created_at = datetime.strptime(new_tweet['created_at'], time_format)
-        captured_at = datetime.now(timezone.utc)
+        created_at  = datetime.strptime(new_tweet['created_at'], time_format)
+        captured_at = datetime.strptime(profile_screen['captured_at'],
+                                        time_format)
         time_delta = (captured_at - created_at)
 
         # TODO: delete ap
