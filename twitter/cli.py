@@ -26,7 +26,9 @@ version = '2.0.1-alpha'
 
 
 def main():
+
     arg = docopt(__doc__, version=version)
+    stderr = sys.stderr
 
     if arg['--guest-token']:
         print(get_guest_token())
@@ -40,7 +42,7 @@ def main():
             for tweet in twitter.user.stream(user=arg['--user']):
                 print(tweet)
         else:
-            print('no user specified, please see --help', file=sys.stderr)
+            print('no user specified, please see --help', file=stderr)
 
     else:
         if arg['--user'] is not None:

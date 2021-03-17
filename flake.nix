@@ -10,7 +10,7 @@
 		pkgs = nixpkgs.legacyPackages.${system};
 	in rec {
 
-		twitter = {lib, buildPythonApplication, docopt, requests, fake-useragent}:
+		twitter = {lib, buildPythonApplication, docopt, requests}:
 			buildPythonApplication rec {
 				pname = "twitter";
 				version = "2.0.1-alpha";
@@ -18,7 +18,6 @@
 				doCheck = false;
 				propagatedBuildInputs = [
 					docopt
-					fake-useragent
 					requests
 				];
 			};

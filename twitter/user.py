@@ -1,28 +1,16 @@
 from datetime import datetime, timezone
-from fake_useragent import UserAgent
-import requests
-from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
+from time import sleep
 from twitter.constant import bearer_token, url_user_screen, user_agent, time_format
 from twitter.util import get_guest_token
+from requests import get
 import sys
 
-retry_strategy = Retry(
-    total=1000,
-    status_forcelist=[429, 500, 502, 503, 504],
-    method_whitelist=["HEAD", "GET", "OPTIONS"]
-)
-adapter = HTTPAdapter(max_retries=retry_strategy)
-http = requests.Session()
-http.mount("https://", adapter)
-http.mount("http://", adapter)
-
-ua = UserAgent()
 headers = {
-    'User-Agent': ua.random,
+    'User-Agent': user_agent,
     'authorization': bearer_token,
     'x-guest-token': get_guest_token()
 }
+stderr = sys.stderr
 
 
 def profile(user=None):
@@ -30,15 +18,26 @@ def profile(user=None):
     Returns user profile as JSON, with last statuses (tweets) that includes
     both Tweet & Replies.
     """
+    global headers
     if user is not None:
 
-        response = http.get(url_user_screen + user, headers=headers)
+        response = get(url_user_screen + user, headers=headers)
 
         if response.ok:
             now = datetime.strftime(datetime.now(timezone.utc), time_format)
             response_json = response.json()
             response_json['captured_at'] = now
             return response_json
+
+        elif response.status_code == 429:  # too many requests (rate limit)
+            print('got 429 too many requests: refreshing guest token...',
+                  file=stderr)
+            print('guest token changed from ',headers['x-guest-token'],
+                    end='', file=stderr)
+            headers['x-guest-token']: get_guest_token()
+            print(' {}'.format(headers['x-guest-token']), file=stderr)
+            profile(user=user)
+
         else:
             response.raise_for_status()
 
@@ -47,20 +46,18 @@ def profile(user=None):
 
 
 def stream(user=None):
-    global headers
     last_reported_tweet = {}
-    counter = 1  # NOTE: stuck after 180
+    counter = 1
     while True:
 
-        print(counter, end='\t', file=sys.stderr)
+        print(counter, end='\t', file=stderr)
         counter += 1
 
-        headers['User-Agent'] = ua.random
         profile_screen = profile(user=user)
         if 'status' in profile_screen:  # if last tweet exists in JSON
             new_tweet = profile_screen['status']
         else:
-            print('no last tweet object in profile JSON', file=sys.stderr)
+            print('no last tweet object in profile JSON', file=stderr)
             continue
 
         created_at  = datetime.strptime(new_tweet['created_at'], time_format)
@@ -68,10 +65,8 @@ def stream(user=None):
                                         time_format)
         time_delta = (captured_at - created_at)
 
-        # TODO: delete ap
-        print(f"since last tweet: {time_delta}", file=sys.stderr)
+        print(f"since last tweet: {time_delta}", file=stderr)
 
-        # TODO: lower time_delta second check: it is currently 20 second range
-        if time_delta.seconds < 10 and new_tweet is not last_reported_tweet:
+        if time_delta.seconds < 60 and new_tweet is not last_reported_tweet:
             last_reported_tweet = new_tweet
             yield new_tweet

@@ -9,7 +9,7 @@ def get_guest_token():
         if match:
             return match.group(1)
         else:
-            raise(Exception('no guest token found in response'))
+            raise(Exception(f'no guest token found in response: {url_base}'))
     else:
         response.raise_for_status()
 
