@@ -98,3 +98,7 @@ JSON object response from
   "require_some_consent": false
 }
 ```
+
+## Notes about Twitter
+
+Currently (2021-03-17 21:07:56) One guest token can get 180 requests at a time.
