@@ -15,7 +15,7 @@ stderr = sys.stderr
 
 def profile(user=None):
     """
-    Returns user profile as JSON, with last statuses (tweets) that includes
+    Returns user profile as JSON, with last tatuses (tweets) that includes
     both Tweet & Replies.
     """
     global headers
@@ -34,7 +34,7 @@ def profile(user=None):
                   file=stderr)
             print('guest token changed from ',headers['x-guest-token'],
                     end='', file=stderr)
-            headers['x-guest-token']: get_guest_token()
+            headers['x-guest-token'] = get_guest_token()
             print(' {}'.format(headers['x-guest-token']), file=stderr)
             profile(user=user)
 

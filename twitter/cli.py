@@ -22,7 +22,7 @@ import json
 import sys
 import twitter.user
 
-version = '2.0.1-alpha'
+version = '2.1.0-alpha'
 
 
 def main():
@@ -46,6 +46,7 @@ def main():
 
     else:
         if arg['--user'] is not None:
+            # FIXME: not implemented
             print(twitter.user.last_tweets(arg['--user']))
 
 
