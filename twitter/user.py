@@ -36,7 +36,7 @@ def profile(user=None):
                     end='', file=stderr)
             headers['x-guest-token'] = get_guest_token()
             print(' {}'.format(headers['x-guest-token']), file=stderr)
-            profile(user=user)
+            return profile(user=user)
 
         else:
             response.raise_for_status()
