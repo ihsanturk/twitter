@@ -55,7 +55,7 @@ def stream(user=None):
             new_tweet = profile_screen['status']
             new_tweet['captured_at'] = profile_screen['captured_at']
         else:
-            print('no last tweet object in profile JSON', file=stderr)
+            print('\nno last tweet object in profile JSON', file=stderr)
             continue
 
         created_at  = snowflake2utc(new_tweet['id'])
