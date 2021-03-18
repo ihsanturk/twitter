@@ -46,10 +46,8 @@ def profile(user=None):
 
 def stream(user=None):
     last_reported_tweet = {}
-    counter = 1
+    counter = 0
     while True:
-
-        print(counter, end='\t', file=stderr)
         counter += 1
 
         profile_screen = profile(user=user)
@@ -65,7 +63,7 @@ def stream(user=None):
         time_delta  = (captured_at - created_at)
         new_tweet['capture_latency_seconds'] = time_delta
 
-        print(f"since last tweet: {time_delta}", file=stderr)
+        print(f"\r{coutner}\tsince last tweet: {time_delta}", file=stderr)
 
         if time_delta < 60 and new_tweet['id'] is not last_reported_tweet['id']:
             last_reported_tweet = new_tweet
