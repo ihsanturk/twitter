@@ -59,8 +59,7 @@ def stream(user=None):
             continue
 
         created_at  = snowflake2utc(new_tweet['id'])
-        captured_at = profile_screen['captured_at'])
-        time_delta  = (captured_at - created_at)
+        time_delta  = (profile_screen['captured_at'] - created_at)
         new_tweet['capture_latency_seconds'] = time_delta
 
         print(f"\r{coutner}\tsince last tweet: {time_delta}", file=stderr)
