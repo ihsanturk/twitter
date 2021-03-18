@@ -1,6 +1,5 @@
-from datetime import datetime, timezone
-from time import sleep
-from twitter.constant import bearer_token, url_user_screen, user_agent, time_format
+from time import sleep, time
+from twitter.constant import bearer_token, url_user_screen, user_agent
 from twitter.util import get_guest_token
 from requests import get
 import sys
@@ -24,7 +23,7 @@ def profile(user=None):
         response = get(url_user_screen + user, headers=headers)
 
         if response.ok:
-            now = datetime.strftime(datetime.now(timezone.utc), time_format)
+            now = time()  # UTC
             response_json = response.json()
             response_json['captured_at'] = now
             return response_json
@@ -61,15 +60,13 @@ def stream(user=None):
             print('no last tweet object in profile JSON', file=stderr)
             continue
 
-        created_at  = datetime.strptime(new_tweet['created_at'], time_format)
-        captured_at = datetime.strptime(profile_screen['captured_at'],
-                                        time_format)
-        time_delta = (captured_at - created_at)
-        new_tweet['capture_latency_seconds'] = time_delta.total_seconds()
+        created_at  = snowflake2utc(new_tweet['id'])
+        captured_at = profile_screen['captured_at'])
+        time_delta  = (captured_at - created_at)
+        new_tweet['capture_latency_seconds'] = time_delta
 
         print(f"since last tweet: {time_delta}", file=stderr)
 
-        if time_delta.seconds < 60 and\
-            new_tweet['id_str'] is not last_reported_tweet['id_str']:
+        if time_delta < 60 and new_tweet['id'] is not last_reported_tweet['id']:
             last_reported_tweet = new_tweet
             yield new_tweet
