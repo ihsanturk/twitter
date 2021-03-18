@@ -18,7 +18,7 @@ Options:
 
 from docopt import docopt
 from twitter.util import get_guest_token
-import json
+from json import dumps
 import sys
 import twitter.user
 
@@ -35,13 +35,13 @@ def main():
 
     if arg['profile']:
         if arg['<username>'] is not None:
-            print(json.dumps(twitter.user.profile(user=arg['<username>'])))
+            print(dumps(twitter.user.profile(user=arg['<username>'])))
 
     elif arg['stream']:
         if arg['--user'] is not None:
             try:
                 for tweet in twitter.user.stream(user=arg['--user']):
-                    print(tweet)
+                    dumps(tweet)
             except KeyboardInterrupt:
                 print('^C')
         else:
