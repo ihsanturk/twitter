@@ -56,6 +56,7 @@ def stream(user=None):
         profile_screen = profile(user=user)
         if 'status' in profile_screen:  # if last tweet exists in JSON
             new_tweet = profile_screen['status']
+            new_tweet['captured_at'] = profile_screen['captured_at']
         else:
             print('no last tweet object in profile JSON', file=stderr)
             continue
@@ -64,6 +65,7 @@ def stream(user=None):
         captured_at = datetime.strptime(profile_screen['captured_at'],
                                         time_format)
         time_delta = (captured_at - created_at)
+        new_tweet['capture_latency_seconds'] = time_delta.total_seconds()
 
         print(f"since last tweet: {time_delta}", file=stderr)
 
