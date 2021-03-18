@@ -1,6 +1,6 @@
 from time import sleep, time
 from twitter.constant import bearer_token, url_user_screen, user_agent
-from twitter.util import get_guest_token
+from twitter.util import get_guest_token, snowflake2utc
 from requests import get
 import sys
 
@@ -62,7 +62,8 @@ def stream(user=None):
         time_delta  = (profile_screen['captured_at'] - created_at)
         new_tweet['capture_latency_seconds'] = time_delta
 
-        print(f"\r{coutner}\tsince last tweet: {time_delta}", file=stderr)
+        print(f"\r{counter}\tsince last tweet: {time_delta}",
+              end='', file=stderr)
 
         if time_delta < 60 and new_tweet['id'] is not last_reported_tweet['id']:
             last_reported_tweet = new_tweet
