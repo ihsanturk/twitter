@@ -22,7 +22,7 @@ from json import dumps
 import sys
 import twitter.user
 
-version = '2.1.0-alpha'
+version = '2.1.0'
 
 
 def main():
