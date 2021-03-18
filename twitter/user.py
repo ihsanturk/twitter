@@ -63,7 +63,7 @@ def stream(user=None):
         time_delta  = (profile_screen['captured_at'] - created_at)
         new_tweet['capture_latency_seconds'] = time_delta
 
-        print("\r{}\tsince last tweet: {}".format(counter,
+        print("\r{}\tsince last tweet: \033[33m{}\033[0m".format(counter,
               timedelta(seconds=time_delta)), end='', file=stderr)
 
         if time_delta < 60 and new_tweet['id'] is not last_reported_tweet['id']:
