@@ -1,4 +1,5 @@
 from time import sleep, time
+from datetime import timedelta
 from twitter.constant import bearer_token, url_user_screen, user_agent
 from twitter.util import get_guest_token, snowflake2utc
 from requests import get
@@ -29,7 +30,7 @@ def profile(user=None):
             return response_json
 
         elif response.status_code == 429:  # too many requests (rate limit)
-            print('got 429 too many requests: refreshing guest token...',
+            print('\ngot 429 too many requests: refreshing guest token...',
                   file=stderr)
             print('guest token changed from ',headers['x-guest-token'],
                     end='', file=stderr)
@@ -62,8 +63,8 @@ def stream(user=None):
         time_delta  = (profile_screen['captured_at'] - created_at)
         new_tweet['capture_latency_seconds'] = time_delta
 
-        print(f"\r{counter}\tsince last tweet: {time_delta}",
-              end='', file=stderr)
+        print("\r{}\tsince last tweet: {}".format(counter,
+              timedelta(seconds=time_delta)), end='', file=stderr)
 
         if time_delta < 60 and new_tweet['id'] is not last_reported_tweet['id']:
             last_reported_tweet = new_tweet
