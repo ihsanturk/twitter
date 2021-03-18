@@ -99,6 +99,10 @@ JSON object response from
 }
 ```
 
+## TODO
+
+- [ ] Add silent (-s) option to hide information. Maybe a custom log function.
+
 ## Notes about Twitter
 
 Currently (2021-03-17 21:07:56) One guest token can get 180 requests at a time.
