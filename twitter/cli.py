@@ -50,7 +50,8 @@ def main():
     else:
         if arg['--user'] is not None:
             # FIXME: not implemented
-            print(twitter.user.last_tweets(arg['--user']))
+            print('user profile not implemented')
+            # print(twitter.user.last_tweets(arg['--user']))
 
 
 if __name__ == '__main__':
