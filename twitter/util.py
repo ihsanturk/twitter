@@ -18,3 +18,7 @@ def get_guest_token():
     else:
         response.raise_for_status()
 
+
+def snowflake2utc(tweetid):
+    return ((tweetid >> 22) + 1288834974657) / 1000.0
+
