@@ -69,6 +69,7 @@ def stream(user=None):
 
         print(f"since last tweet: {time_delta}", file=stderr)
 
-        if time_delta.seconds < 60 and new_tweet is not last_reported_tweet:
+        if time_delta.seconds < 60 and\
+            new_tweet['id_str'] is not last_reported_tweet['id_str']:
             last_reported_tweet = new_tweet
             yield new_tweet
