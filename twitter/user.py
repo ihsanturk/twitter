@@ -13,12 +13,19 @@ headers = {
 stderr = sys.stderr
 
 
+def refresh_guest_token():
+    global headers
+    print('guest token changed from ',headers['x-guest-token'], end='',
+          file=stderr)
+    headers['x-guest-token'] = get_guest_token()
+    print(' {}'.format(headers['x-guest-token']), file=stderr)
+
+
 def profile(user=None):
     """
     Returns user profile as JSON, with last tatuses (tweets) that includes
     both Tweet & Replies.
     """
-    global headers
     if user is not None:
 
         response = get(url_user_screen + user, headers=headers)
@@ -32,10 +39,13 @@ def profile(user=None):
         elif response.status_code == 429:  # too many requests (rate limit)
             print('\ngot 429 too many requests: refreshing guest token...',
                   file=stderr)
-            print('guest token changed from ',headers['x-guest-token'],
-                    end='', file=stderr)
-            headers['x-guest-token'] = get_guest_token()
-            print(' {}'.format(headers['x-guest-token']), file=stderr)
+            refresh_guest_token()
+            return profile(user=user)
+
+        elif response.status_code == 500:
+            print('\ngot 500 internal server error: refreshing guest token...',
+                  file=stderr)
+            refresh_guest_token()
             return profile(user=user)
 
         else:
