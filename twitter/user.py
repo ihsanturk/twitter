@@ -10,6 +10,7 @@ headers = {
     'authorization': bearer_token,
     'x-guest-token': get_guest_token()
 }
+retry_on_http_error = [429, 500, 403]
 stderr = sys.stderr
 
 
@@ -36,14 +37,8 @@ def profile(user=None):
             response_json['captured_at'] = now
             return response_json
 
-        elif response.status_code == 429:  # too many requests (rate limit)
-            print('\ngot 429 too many requests: refreshing guest token...',
-                  file=stderr)
-            refresh_guest_token()
-            return profile(user=user)
-
-        elif response.status_code == 500:
-            print('\ngot 500 internal server error: refreshing guest token...',
+        elif response.status_code in retry_on_http_error:
+            print(f'\ngot {response.status_code}: refreshing guest token...',
                   file=stderr)
             refresh_guest_token()
             return profile(user=user)
@@ -73,6 +68,7 @@ def stream(user=None):
         time_delta  = (profile_screen['captured_at'] - created_at)
         new_tweet['capture_latency_seconds'] = time_delta
 
+        yield new_tweet  # TODO: DELETE
         print("\r{}\tsince last tweet: \033[33m{}\033[0m".format(counter,
               timedelta(seconds=time_delta)), end='', file=stderr)
 
