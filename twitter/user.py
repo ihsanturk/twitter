@@ -56,7 +56,7 @@ def profile(user=None):
 
 
 def stream(user=None):
-    last_reported_tweet = {}
+    last_reported_tweet = {'id': 0}
     counter = 0
     while True:
         counter += 1
