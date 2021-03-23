@@ -12,14 +12,12 @@ Options:
   -g --guest-token          Get a guest token from Twitter.
   -h --help                 Show this screen.
   -u --user <username>      Show latest tweets of a user.
-  --version                 Show the version.
-
-"""
+  --version                 Show the version."""
 
 from docopt import docopt
 from twitter.util import get_guest_token
 from json import dumps
-import sys
+from sys import stderr, exit
 import twitter.user
 
 version = '2.1.0'
@@ -28,7 +26,6 @@ version = '2.1.0'
 def main():
 
     arg = docopt(__doc__, version=version)
-    stderr = sys.stderr
 
     if arg['--guest-token']:
         print(get_guest_token())

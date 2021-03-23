@@ -32,9 +32,8 @@ def profile(user=None):
         response = get(url_user_screen + user, headers=headers)
 
         if response.ok:
-            now = time()  # UTC
             response_json = response.json()
-            response_json['captured_at'] = now
+            response_json['captured_at'] = time()
             return response_json
 
         elif response.status_code in retry_on_http_error:
@@ -59,18 +58,17 @@ def stream(user=None):
         profile_screen = profile(user=user)
         if 'status' in profile_screen:  # if last tweet exists in JSON
             new_tweet = profile_screen['status']
-            new_tweet['captured_at'] = profile_screen['captured_at']
         else:
             print('\nno last tweet object in profile JSON', file=stderr)
-            continue
+            continue  # try again
 
-        created_at  = snowflake2utc(new_tweet['id'])
-        time_delta  = (profile_screen['captured_at'] - created_at)
+        created_at = snowflake2utc(new_tweet['id'])
+        time_delta = (profile_screen['captured_at'] - created_at)
         new_tweet['capture_latency_seconds'] = time_delta
 
-        yield new_tweet  # TODO: DELETE
-        print("\r{}\tsince last tweet: \033[33m{}\033[0m".format(counter,
-              timedelta(seconds=time_delta)), end='', file=stderr)
+        print("\r{}\tsince {}'s last tweet: \033[33m{}\033[0m".format(
+              counter, user, timedelta(seconds=time_delta)),
+              end='', file=stderr)
 
         if time_delta < 60 and new_tweet['id'] is not last_reported_tweet['id']:
             last_reported_tweet = new_tweet
