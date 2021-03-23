@@ -41,7 +41,7 @@ def main():
         if arg['--user'] is not None:
             try:
                 for tweet in twitter.user.stream(user=arg['--user']):
-                    dumps(tweet)
+                    print(dumps(tweet))
             except KeyboardInterrupt:
                 print('^C')
         else:
