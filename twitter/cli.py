@@ -32,13 +32,15 @@ def main():
 
     if arg['profile']:
         if arg['<username>'] is not None:
-            print(dumps(twitter.user.profile(user=arg['<username>'])))
+            print(dumps(twitter.user.profile(user=arg['<username>'])),
+                    flush=True)
 
     elif arg['stream']:
         if arg['--user'] is not None:
             try:
                 for tweet in twitter.user.stream(user=arg['--user']):
                     print(dumps(tweet))
+                    stdout.flush()
             except KeyboardInterrupt:
                 print('^C')
         else:
