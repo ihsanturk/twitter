@@ -9,6 +9,7 @@ Usage:
   twitter --version
 
 Options:
+  -v --verbose              Print additional messages about processes.
   -g --guest-token          Get a guest token from Twitter.
   -h --help                 Show this screen.
   -u --user <username>      Show latest tweets of a user.
@@ -38,7 +39,8 @@ def main():
     elif arg['stream']:
         if arg['--user'] is not None:
             try:
-                for tweet in twitter.user.stream(user=arg['--user']):
+                for tweet in twitter.user.stream(user=arg['--user'],
+                                                 verbose=arg['--verbose']):
                     print(dumps(tweet))
                     stdout.flush()
             except KeyboardInterrupt:
