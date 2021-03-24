@@ -74,6 +74,6 @@ def stream(user=None, verbose=False):
                   counter, user, timedelta(seconds=time_delta)),
                   end='', file=stderr)
 
-        if time_delta < 60 and new_tweet['id'] is not last_reported_tweet['id']:
-            last_reported_tweet = new_tweet
+        if time_delta < 60 and new_tweet['id'] != last_reported_tweet['id']:
+            last_reported_tweet['id'] = new_tweet['id']
             yield new_tweet
