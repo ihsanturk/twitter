@@ -18,7 +18,7 @@ Options:
 from docopt import docopt
 from twitter.util import get_guest_token
 from json import dumps
-from sys import stderr, exit
+from sys import stdout, stderr, exit
 import twitter.user
 
 version = '2.1.0'
@@ -48,11 +48,13 @@ def main():
         else:
             print('no user specified, please see --help', file=stderr)
 
+    elif arg['--help']:
+        print(__doc__, file=stderr)
+        exit(0)
+
     else:
-        if arg['--user'] is not None:
-            # FIXME: not implemented
-            print('user profile not implemented')
-            # print(twitter.user.last_tweets(arg['--user']))
+        print(__doc__, file=stderr)
+        exit(1)
 
 
 if __name__ == '__main__':

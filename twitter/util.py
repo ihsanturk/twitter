@@ -1,9 +1,7 @@
 from requests import get
 from twitter.constant import url_base, bearer_token, user_agent
 import re
-import sys
-
-stderr = sys.stderr
+from sys import stderr
 
 def get_guest_token():
     response = get(url_base, headers={'User-Agent': user_agent})

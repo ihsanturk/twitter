@@ -3,7 +3,7 @@ from datetime import timedelta
 from twitter.constant import bearer_token, url_user_screen, user_agent
 from twitter.util import get_guest_token, snowflake2utc
 from requests import get
-import sys
+from sys import stderr
 
 headers = {
     'User-Agent': user_agent,
@@ -11,7 +11,6 @@ headers = {
     'x-guest-token': get_guest_token()
 }
 retry_on_http_error = [429, 500, 403]
-stderr = sys.stderr
 
 
 def refresh_guest_token(verbose=False):
