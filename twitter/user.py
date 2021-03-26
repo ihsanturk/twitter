@@ -10,7 +10,7 @@ headers = {
     'authorization': bearer_token,
     'x-guest-token': get_guest_token()
 }
-retry_on_http_error = [429, 500, 403]
+retry_on_http_error = [429, 500, 403, 503]
 
 
 def refresh_guest_token(verbose=False):
