@@ -2,7 +2,7 @@ from time import sleep, time
 from datetime import timedelta
 from twitter.constant import bearer_token, url_user_screen, user_agent
 from twitter.util import get_guest_token, snowflake2utc
-from requests import get
+from requests import get, exceptions
 from sys import stderr
 
 headers = {
@@ -30,13 +30,18 @@ def profile(user=None, verbose=False):
     """
     if user is not None:
 
-        response = get(url_user_screen + user, headers=headers)
+        try:
+            response = get(url_user_screen + user, headers=headers)
+        except Exception as e:
+            print(e, file=stderr)
+            profile(user=user, verbose=verbose)
 
         if response.ok:
             response_json = response.json()
             response_json['captured_at'] = time()
             return response_json
 
+        # TODO: better retry logic: https://stackoverflow.com/a/35504626/12536010
         elif response.status_code in retry_on_http_error:
             if verbose:
                 print(f'\ngot {response.status_code}: refreshing guest token...',
