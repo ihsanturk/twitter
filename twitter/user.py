@@ -34,7 +34,7 @@ def profile(user=None, verbose=False):
             response = get(url_user_screen + user, headers=headers)
         except Exception as e:
             print(e, file=stderr)
-            profile(user=user, verbose=verbose)
+            return profile(user=user, verbose=verbose)
 
         if response.ok:
             response_json = response.json()
