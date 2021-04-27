@@ -21,7 +21,7 @@ from json import dumps
 from sys import stdout, stderr, exit
 import twitter.user
 
-version = '2.2.0'
+version = '2.2.1'
 
 
 def main():
