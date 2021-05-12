@@ -20,10 +20,21 @@ def refresh():
     return get(url).text.splitlines()
 
 
+def get_nth(proxies, n):
+    """
+    >>> proxies = refresh()
+    >>> proxy_dict = proxy.get_nth(proxies, 15)
+    """
+    return {
+        'http':  'http://' + proxies[n],
+        'https': 'http://' + proxies[n]
+    }
+
+
 def get_one_random(proxies):
     """
     >>> proxies = refresh()
-    >>> ip, port = proxy.get_one(proxies, 15)
+    >>> proxy_dict = proxy.get_one_random(proxies)
     """
     random_index = randint(0, len(proxies)-1)
     return {

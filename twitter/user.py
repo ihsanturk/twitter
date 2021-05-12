@@ -1,10 +1,10 @@
-from time import sleep, time
 from datetime import timedelta
-from twitter.constant import bearer_token, url_user_screen, user_agent
-from twitter.util import get_guest_token, snowflake2utc
 from requests import get, exceptions
 from sys import stderr
-import twitter.proxy
+from time import sleep, time
+from twitter.constant import bearer_token, url_user_screen, user_agent
+from twitter.util import get_guest_token, snowflake2utc
+import twitter.proxy as proxy
 
 headers = {
     'User-Agent': user_agent,
@@ -12,9 +12,9 @@ headers = {
     'x-guest-token': get_guest_token()
 }
 retry_on_http_error = [429, 500, 403, 503]
-proxies = []
+proxies_ = proxy.refresh()
 proxy_index = 0
-current_proxy = None
+current_proxy = proxy.get_nth(proxies_, proxy_index)
 
 
 def refresh_guest_token(verbose=False):
@@ -33,16 +33,16 @@ def profile(user=None, verbose=False, useproxies=False):
     both Tweet & Replies.
     """
     global current_proxy
-    global proxies
+    global proxies_
     global proxy_index
 
     if user is not None:
 
         try:
             if useproxies:
-                if proxies == []:
-                    proxies = proxy.refresh()
-                    current_proxy = proxies[proxy_index]
+                if proxies_ == []:
+                    proxies_ = proxy.refresh()
+                    current_proxy = proxy.get_nth(proxies_, proxy_index)
                 response = get(url_user_screen + user, headers=headers,
                                proxies=current_proxy)
             else:
@@ -50,13 +50,13 @@ def profile(user=None, verbose=False, useproxies=False):
         except Exception as e:
             print(e, file=stderr)
 
-            # rotate proxies
+            # rotate proxies_
             proxy_index += 1
-            if proxy_index >= len(proxies)-1:
-                proxies = proxy.refresh()
+            if proxy_index >= len(proxies_)-1:
+                proxies_ = proxy.refresh()
                 if verbose:
                     print("refresh: proxies", file=stderr)
-            current_proxy = proxies[proxy_index]
+            current_proxy = proxy.get_nth(proxies_, proxy_index)
 
             return profile(user=user, verbose=verbose, useproxies=useproxies)
 
@@ -68,7 +68,7 @@ def profile(user=None, verbose=False, useproxies=False):
         # TODO: better retry logic: https://stackoverflow.com/a/35504626/12536010
         elif response.status_code in retry_on_http_error:
             if verbose:
-                print(f'\ngot {response.status_code}: refreshing guest token...',
+                print(f'\ngot {response.status_code}. refreshing guest token...',
                       file=stderr)
             refresh_guest_token(verbose=verbose)
             return profile(user=user, verbose=verbose, useproxies=useproxies)
@@ -85,12 +85,8 @@ def stream(user=None, verbose=False, useproxies=False):
     counter = 0 # requests sent
 
     global current_proxy
-    global proxies
+    global proxies_
     global proxy_index
-
-    proxies = proxy.refresh()
-    proxy_index = 0
-    current_proxy = proxies[proxy_index]
 
     while True:
         counter += 1

@@ -31,6 +31,7 @@ def main():
     if arg['profile']:
         if arg['<username>'] is not None:
             print(dumps(twitter.user.profile(user=arg['<username>'],
+                                             verbose=arg['--verbose'],
                                              useproxies=arg['--proxyscrape'])),
                   flush=True)
 
