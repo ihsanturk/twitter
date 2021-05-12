@@ -1,18 +1,14 @@
 """twitter - Twitter scraper, streamer
 
 Usage:
-  twitter stream [options] -u <username>
-  twitter profile <username>
-  twitter (-u <username> | --username <username>)
+  twitter (profile | stream) <username> [options]
   twitter (-g | --guest-token)
   twitter (-h | --help)
   twitter --version
 
 Options:
   -v --verbose              Print additional messages about processes.
-  -g --guest-token          Get a guest token from Twitter.
   -h --help                 Show this screen.
-  -u --user <username>      Show latest tweets of a user.
   -p --proxyscrape          ProxyScrape API key to use premium proxies.
   --version                 Show the version."""
 
@@ -29,7 +25,7 @@ def main():
 
     arg = docopt(__doc__, version=version)
 
-    if arg['--guest-token']:
+    if arg['-g'] or arg['--guest-token']:
         print(get_guest_token())
 
     if arg['profile']:
@@ -39,9 +35,9 @@ def main():
                   flush=True)
 
     elif arg['stream']:
-        if arg['--user'] is not None:
+        if arg['<username>'] is not None:
             try:
-                for tweet in twitter.user.stream(user=arg['--user'],
+                for tweet in twitter.user.stream(user=arg['<username>'],
                                                verbose=arg['--verbose'],
                                                useproxies=arg['--proxyscrape']):
                     print(dumps(tweet))
