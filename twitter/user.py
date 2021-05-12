@@ -4,6 +4,7 @@ from twitter.constant import bearer_token, url_user_screen, user_agent
 from twitter.util import get_guest_token, snowflake2utc
 from requests import get, exceptions
 from sys import stderr
+import twitter.proxy
 
 headers = {
     'User-Agent': user_agent,
@@ -11,6 +12,9 @@ headers = {
     'x-guest-token': get_guest_token()
 }
 retry_on_http_error = [429, 500, 403, 503]
+proxies = []
+proxy_index = 0
+current_proxy = None
 
 
 def refresh_guest_token(verbose=False):
@@ -23,18 +27,38 @@ def refresh_guest_token(verbose=False):
         print(' {}'.format(headers['x-guest-token']), file=stderr)
 
 
-def profile(user=None, verbose=False):
+def profile(user=None, verbose=False, useproxies=False):
     """
     Returns user profile as JSON, with last tatuses (tweets) that includes
     both Tweet & Replies.
     """
+    global current_proxy
+    global proxies
+    global proxy_index
+
     if user is not None:
 
         try:
-            response = get(url_user_screen + user, headers=headers)
+            if useproxies:
+                if proxies == []:
+                    proxies = proxy.refresh()
+                    current_proxy = proxies[proxy_index]
+                response = get(url_user_screen + user, headers=headers,
+                               proxies=current_proxy)
+            else:
+                response = get(url_user_screen + user, headers=headers)
         except Exception as e:
             print(e, file=stderr)
-            return profile(user=user, verbose=verbose)
+
+            # rotate proxies
+            proxy_index += 1
+            if proxy_index >= len(proxies)-1:
+                proxies = proxy.refresh()
+                if verbose:
+                    print("refresh: proxies", file=stderr)
+            current_proxy = proxies[proxy_index]
+
+            return profile(user=user, verbose=verbose, useproxies=useproxies)
 
         if response.ok:
             response_json = response.json()
@@ -47,7 +71,7 @@ def profile(user=None, verbose=False):
                 print(f'\ngot {response.status_code}: refreshing guest token...',
                       file=stderr)
             refresh_guest_token(verbose=verbose)
-            return profile(user=user, verbose=verbose)
+            return profile(user=user, verbose=verbose, useproxies=useproxies)
 
         else:
             response.raise_for_status()
@@ -56,14 +80,24 @@ def profile(user=None, verbose=False):
         raise(Exception('no user specified for function: profile()'))
 
 
-def stream(user=None, verbose=False):
+def stream(user=None, verbose=False, useproxies=False):
     last_reported_tweet = {'id': 0}
-    counter = 0
+    counter = 0 # requests sent
+
+    global current_proxy
+    global proxies
+    global proxy_index
+
+    proxies = proxy.refresh()
+    proxy_index = 0
+    current_proxy = proxies[proxy_index]
+
     while True:
         counter += 1
 
-        profile_screen = profile(user=user, verbose=verbose)
-        if 'status' in profile_screen:  # if last tweet exists in JSON
+        profile_screen = profile(user=user, verbose=verbose,
+                                 useproxies=useproxies)
+        if 'status' in profile_screen:  # if last tweet exists in response JSON
             new_tweet = profile_screen['status']
         else:
             if verbose:

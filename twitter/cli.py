@@ -13,6 +13,7 @@ Options:
   -g --guest-token          Get a guest token from Twitter.
   -h --help                 Show this screen.
   -u --user <username>      Show latest tweets of a user.
+  -p --proxyscrape          ProxyScrape API key to use premium proxies.
   --version                 Show the version."""
 
 from docopt import docopt
@@ -21,7 +22,7 @@ from json import dumps
 from sys import stdout, stderr, exit
 import twitter.user
 
-version = '2.2.1'
+version = '2.2.2'
 
 
 def main():
@@ -33,14 +34,16 @@ def main():
 
     if arg['profile']:
         if arg['<username>'] is not None:
-            print(dumps(twitter.user.profile(user=arg['<username>'])),
-                    flush=True)
+            print(dumps(twitter.user.profile(user=arg['<username>'],
+                                             useproxies=arg['--proxyscrape'])),
+                  flush=True)
 
     elif arg['stream']:
         if arg['--user'] is not None:
             try:
                 for tweet in twitter.user.stream(user=arg['--user'],
-                                                 verbose=arg['--verbose']):
+                                               verbose=arg['--verbose'],
+                                               useproxies=arg['--proxyscrape']):
                     print(dumps(tweet))
                     stdout.flush()
             except KeyboardInterrupt:

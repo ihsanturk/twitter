@@ -3,6 +3,7 @@ from twitter.constant import url_base, bearer_token, user_agent
 import re
 from sys import stderr
 
+
 def get_guest_token():
     response = get(url_base, headers={'User-Agent': user_agent})
     if response.ok:
