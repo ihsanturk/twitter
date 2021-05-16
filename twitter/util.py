@@ -1,11 +1,15 @@
 from requests import get
-from twitter.constant import url_base, bearer_token, user_agent
-import re
 from sys import stderr
+from twitter.constant import bearer_token
+from twitter.constant import url_base
+from twitter.constant import url_user_by_screen_name
+from twitter.constant import user_agent
+import re
 
+proxies_ = {}
 
 def get_guest_token():
-    response = get(url_base, headers={'User-Agent': user_agent})
+    response = get(url_base, headers={'User-Agent':user_agent},proxies=proxies_)
     if response.ok:
         match = re.search(r'\("gt=(\d+);', response.text)
         if match:
@@ -13,7 +17,20 @@ def get_guest_token():
         else:
             print(f'no guest token found in response: {url_base}. retrying to'\
                    ' get guest token...', file=stderr)
-            get_guest_token()
+            return get_guest_token()
+    else:
+        response.raise_for_status()
+
+
+def get_user_id(username):
+    headers = {
+        'User-Agent': user_agent,
+        'authorization': bearer_token,
+        'x-guest-token': get_guest_token()
+    }
+    response = get(url_user_by_screen_name, headers=headers, proxies=proxies_)
+    if response.ok:
+        print(response.json)
     else:
         response.raise_for_status()
 
