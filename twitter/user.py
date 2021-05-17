@@ -56,7 +56,11 @@ def profile(user=None, verbose=False, useproxies=False):
                 proxies_ = proxy.refresh()
                 if verbose:
                     print("refresh: proxies", file=stderr)
+            if verbose:
+                print(f"proxy changed from {current_proxy}", file=stderr,end='')
             current_proxy = proxy.get_nth(proxies_, proxy_index)
+            if verbose:
+                print(f" -> {current_proxy}", file=stderr)
 
             return profile(user=user, verbose=verbose, useproxies=useproxies)
 
