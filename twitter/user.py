@@ -52,8 +52,9 @@ def profile(user=None, verbose=False, useproxies=False):
 
             # rotate proxies_
             proxy_index += 1
-            if proxy_index >= len(proxies_)-2:
+            if proxy_index > len(proxies_)-1:
                 proxies_ = proxy.refresh()
+                proxy_index = 0
                 if verbose:
                     print(f"{proxy_index = }", file=stderr)
                     print("refresh: proxies", file=stderr)
