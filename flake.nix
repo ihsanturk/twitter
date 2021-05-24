@@ -13,7 +13,7 @@
 		twitter = {lib, buildPythonApplication, docopt, requests}:
 			buildPythonApplication rec {
 				pname = "twitter";
-				version = "2.2.2";
+				version = "2.2.3";
 				src = lib.cleanSource ./.;
 				doCheck = false;
 				propagatedBuildInputs = [

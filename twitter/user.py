@@ -102,8 +102,8 @@ def stream(user=None, verbose=False, useproxies=False):
         if 'status' in profile_screen:  # if last tweet exists in response JSON
             new_tweet = profile_screen['status']
         else:
-            if verbose:
-                print('\nno last tweet object in profile JSON', file=stderr)
+            # if verbose:
+            #     print('\nno last tweet object in profile JSON', file=stderr)
             continue  # try again
 
         created_at = snowflake2utc(new_tweet['id'])
