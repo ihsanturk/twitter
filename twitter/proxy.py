@@ -16,8 +16,11 @@ url = 'https://api.proxyscrape.com/v2/account/datacenter_shared/proxy-list'\
 def refresh():
     """
     >>> proxies = refresh()
+    ['ip:port', ...]
     """
-    return get(url).text.splitlines()
+    response = get(url)
+    # if proxy scrape stop its service this will cause infinite loop
+    return response.text.splitlines() if response.ok else refresh()
 
 
 def get_nth(proxies, n):
